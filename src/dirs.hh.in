@@ -1,0 +1,7 @@
+#ifndef CLOUD_TREATMENT_ECTO_DIRS_HH
+#define CLOUD_TREATMENT_ECTO_DIRS_HH
+
+#define POINT_CLOUD_PATH "@CMAKE_INSTALL_FULL_DATADIR@/cloud_treatment_ecto/point_cloud"
+#define POINT_CLOUD_BUILD_PATH "@CMAKE_SOURCE_DIR@/share/cloud_treatment_ecto/point_cloud"
+
+#endif //! CLOUD_TREATMENT_DIRS_HH
