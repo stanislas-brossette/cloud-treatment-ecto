@@ -61,6 +61,7 @@ namespace cloud_treatment
 
 		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
 		{
+			temp_normals_ = boost::make_shared<pcl::PointCloud< pcl::Normal> > ();
 			min_cluster_size_ = params["min_cluster_size"];
 			max_cluster_size_ = params["max_cluster_size"];
 			smooth_mode_flag_ = params["smooth_mode_flag"];
@@ -72,8 +73,6 @@ namespace cloud_treatment
 			number_of_neighbours_ = params["number_of_neighbours"];
 
 			clusters_ = outputs["clusters"];
-
-
 		}
 
 		template <typename Point>
@@ -81,13 +80,10 @@ namespace cloud_treatment
 					boost::shared_ptr<const pcl::PointCloud<Point> >& input,
 					boost::shared_ptr<const pcl::PointCloud<pcl::Normal > >& normals)
 		{
-			std::cout << "normals->points.size() = " << normals->points.size() << std::endl;
-			std::cout << "input->points.size() = " << input->points.size() << std::endl;
-			// do something with our params/clouds
 			pcl::RegionGrowing<Point, pcl::Normal> reg;
-			std::cout << "0\n";
 			clusters_->resize(0);
-			std::cout << "1\n";
+
+			//Set the algorithm's parameters
 			reg.setMinClusterSize (*min_cluster_size_);
 			reg.setMaxClusterSize (*max_cluster_size_);
 			reg.setSmoothModeFlag (*smooth_mode_flag_);
@@ -98,20 +94,17 @@ namespace cloud_treatment
 			reg.setCurvatureThreshold (*curvature_threshold_);
 			reg.setNumberOfNeighbours (*number_of_neighbours_);
 
-			pcl::PointCloud< pcl::Normal > temp_normals_;
-			std::cout << "2\n";
-			pcl::copyPointCloud(*normals, temp_normals_);
-			std::cout << "3\n";
-			boost::shared_ptr<pcl::PointCloud< pcl::Normal> > temp_normals = boost::make_shared<pcl::PointCloud< pcl::Normal> > (temp_normals_);
-			std::cout << "4\n";
-			reg.setInputNormals(temp_normals);
-			std::cout << "5\n";
+			////TO FIX
+			//A copy is necessary to match the signature of
+			//the pcl::RegionGrowing::setInputNormals method
+			pcl::copyPointCloud(*normals, *temp_normals_);
+			////
+
+			reg.setInputNormals(temp_normals_);
 			reg.setInputCloud(input);
 
-			std::cout << "6\n";
 			reg.extract (*clusters_);
 
-			std::cout << "7\n";
 			return ecto::OK;
 		}
 		// Store params/inputs/outputs in spores
@@ -126,7 +119,7 @@ namespace cloud_treatment
 		ecto::spore<int> number_of_neighbours_;
 		ecto::spore<ecto::pcl::Clusters> clusters_;
 
-//		ecto::spore< pcl::PointCloud< pcl::Normal > > temp_normals_;
+		boost::shared_ptr<pcl::PointCloud< pcl::Normal> > temp_normals_;
 	};
 }
 
