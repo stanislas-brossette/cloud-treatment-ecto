@@ -15,6 +15,7 @@ SOURCES += \
     src/cpp/_blue_print_ecto_pcl_cell.cpp \
     src/cpp/cloudviewercell.cpp \
     src/cpp/passthroughcell.cpp \
-    src/cpp/pcdreadercell.cpp
+    src/cpp/pcdreadercell.cpp \
+    src/cpp/regiongrowingcell.cpp
 
 HEADERS +=

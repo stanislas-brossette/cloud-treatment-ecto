@@ -107,7 +107,7 @@ namespace cloud_treatment
 				if (!viewer->updatePointCloud<Point>(cloud, key))
 				{
 					viewer->addPointCloud<Point>(cloud, key);
-					viewer->resetCameraViewpoint (key);
+//					viewer->resetCameraViewpoint (key);
 				}
 			}
 			void
@@ -119,7 +119,7 @@ namespace cloud_treatment
 				if (!viewer->updatePointCloud(cloud, rgb, key))
 				{
 					viewer->addPointCloud(cloud, rgb, key);
-					viewer->resetCameraViewpoint (key);
+//					viewer->resetCameraViewpoint (key);
 				}
 			}
 			void
@@ -134,7 +134,7 @@ namespace cloud_treatment
 				if (!viewer->updatePointCloud(cloud, rgb, key))
 				{
 					viewer->addPointCloud(cloud, rgb, key);
-					viewer->resetCameraViewpoint (key);
+//					viewer->resetCameraViewpoint (key);
 				}
 				//          viewer->updatePointCloud(cloud,normals,key);
 			}

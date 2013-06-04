@@ -1,6 +1,7 @@
+#include <pcl/filters/passthrough.h>
+
 #include <ecto_pcl/ecto_pcl.hpp>
 #include <ecto_pcl/pcl_cell.hpp>
-#include <pcl/filters/passthrough.h>
 
 namespace cloud_treatment
 {
@@ -9,7 +10,8 @@ namespace cloud_treatment
 		static void declare_params(tendrils& params)
 		{
 			::pcl::PassThrough< ::pcl::PointXYZ > default_;
-			params.declare<std::string> ("filter_field_name", "The name of the field to use for filtering.", "");
+			params.declare<std::string> ("filter_field_name",
+										 "The name of the field to use for filtering.", "");
 	#if PCL_VERSION_COMPARE(<,1,6,0)
 			double filter_limit_min, filter_limit_max;
 			default_.getFilterLimits(filter_limit_min, filter_limit_max);
@@ -17,10 +19,15 @@ namespace cloud_treatment
 			float filter_limit_min, filter_limit_max;
 			default_.getFilterLimits(filter_limit_min, filter_limit_max);
 	#endif
-			params.declare<double> ("filter_limit_min", "Minimum value for the filter.", filter_limit_min);
-			params.declare<double> ("filter_limit_max", "Maximum value for the filter.", filter_limit_max);
-			params.declare<bool> ("filter_limit_negative", "To negate the limits or not.", default_.getFilterLimitsNegative());
-			params.declare<bool> ("keep_organized", "To keep the point-cloud organized or not", true);
+			params.declare<double> ("filter_limit_min",
+									"Minimum value for the filter.", filter_limit_min);
+			params.declare<double> ("filter_limit_max",
+									"Maximum value for the filter.", filter_limit_max);
+			params.declare<bool> ("filter_limit_negative",
+								  "To negate the limits or not.",
+								  default_.getFilterLimitsNegative());
+			params.declare<bool> ("keep_organized",
+								  "To keep the point-cloud organized or not", true);
 		}
 
 		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
@@ -69,6 +76,6 @@ namespace cloud_treatment
 
 
 
-ECTO_CELL(cloud_treatment, ecto::pcl::PclCell<cloud_treatment::PassThroughCell>, "PassThroughCell",
-		  "PassThrough filter");
+ECTO_CELL(cloud_treatment, ecto::pcl::PclCell<cloud_treatment::PassThroughCell>,
+		  "PassThroughCell", "PassThrough filter");
 

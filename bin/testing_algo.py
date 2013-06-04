@@ -9,41 +9,51 @@ import argparse
 
 import cloud_treatment_ecto.cloud_treatment as cloud_treatment
 
-
 parser = argparse.ArgumentParser(description='My awesome program thing.')
 scheduler_options(parser)
+
+parser.add_argument('-p', '--pcdfile'
+			, default='crapahut.pcd', help='The pcdfile to input')
+
 options = parser.parse_args()
-
+pcdfilename = options.pcdfile
 plasm = ecto.Plasm()
-pcdfile = 'cloud.pcd'
-
-
-#if len(sys.argv) > 1:
-#    pcdfile = sys.argv[1]
 
 reader = cloud_treatment.PCDReaderCell(	"Reader_ecto",
-					filename=pcdfile)
+					filename=pcdfilename)
 viewer = cloud_treatment.CloudViewerCell("Viewer_ecto",
 					window_name="PCD Viewer")
 xyz_switch_cell = cloud_treatment.XYZSwitchCell("XYZ_Switch_Cell")
-passthrough1 = cloud_treatment.PassThroughCell(	"passthrough1",
-					filter_field_name='z',
-					filter_limit_max=4)
-
-passthrough2 = cloud_treatment.PassThroughCell(	"passthrough2",
+passthrough = cloud_treatment.PassThroughCell(	"passthrough",
 					filter_field_name='z',
 					filter_limit_max=4)
 
 voxel_grid = ecto_pcl.VoxelGrid(	"voxel_grid",
-					leaf_size=0.005)
+					leaf_size=0.01)
 
 #moving_least_quares = ecto_pcl.MovingLeastSquares("MovingLeastSquare")
-#normals = ecto_pcl.NormalEstimation("normals", k_search=0, radius_search=0.02)
+normals = ecto_pcl.NormalEstimation("normals", k_search=0, radius_search=0.02)
 
-graph = [reader['output'] >> passthrough1['input'],
-	passthrough1['output'] >> passthrough2['input'],
-	passthrough2['output'] >> voxel_grid['input'],
-	voxel_grid['output'] >> viewer['input']
+graph = [reader['output'] >> passthrough['input'],
+	passthrough['output'] >> voxel_grid['input']
+	]
+
+region_growing = cloud_treatment.RegionGrowingCell("RegionGrowingCell",
+						min_cluster_size=500,
+						max_cluster_size=70000,
+						number_of_neighbours=30,
+						smoothness_threshold=6,
+						curvature_threshold=1
+						)
+colorize = ecto_pcl.ColorizeClusters("colorize")
+
+graph += [
+	voxel_grid[:] >> normals[:],
+	voxel_grid[:] >> region_growing["input"],
+	normals[:] >> region_growing["normals"],
+	region_growing[:] >> colorize["clusters"],
+	voxel_grid[:] >> colorize["input"],
+	colorize[:] >> viewer[:]
 	]
 
 plasm = ecto.Plasm()

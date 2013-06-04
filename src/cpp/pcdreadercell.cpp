@@ -34,6 +34,8 @@
 #include <ecto_pcl/ecto_pcl.hpp>
 #include <pcl/io/pcd_io.h>
 
+#include "dirs.hh"
+
 namespace cloud_treatment
 {
 	struct PCDReaderCell

@@ -1,6 +1,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+include(cmake/portability.cmake)
+
 project(cloud_treatment_ecto)
 
 find_package(catkin REQUIRED)
@@ -13,18 +15,6 @@ find_package(PCL 1.7 REQUIRED
 include_directories(SYSTEM ${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
-
-ectomodule(cloud_treatment DESTINATION cloud_treatment_ecto INSTALL
-    src/cpp/cloud_treatment.cpp
-    src/cpp/cloudviewercell.cpp
-    src/cpp/passthroughcell.cpp
-    src/cpp/pcdreadercell.cpp
-    src/cpp/xyzswitchcell.cpp
-)
-
-link_ecto(cloud_treatment
-  ${PCL_LIBRARIES}
-)
 
 add_subdirectory(bin)
 add_subdirectory(share)
