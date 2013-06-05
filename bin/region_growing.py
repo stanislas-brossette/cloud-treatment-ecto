@@ -25,21 +25,44 @@ reader = cloud_treatment.PCDReaderCell(
 
 viewer = cloud_treatment.CloudViewerCell(
 					"Viewer_ecto",
-					window_name="PCD Viewer")
+					window_name="PCD Viewer")\
 
 passthrough = cloud_treatment.PassThroughCell(
 					"passthrough",
 					filter_field_name='z',
 					filter_limit_max=4)
 
-normals = cloud_treatment.NormalEstimationCell(
-					"normals")
+voxel_grid = ecto_pcl.VoxelGrid(
+					"voxel_grid",
+					leaf_size=0.01)
 
-colorize = ecto_pcl.ColorizeClusters("colorize")
+normals_ecto = ecto_pcl.NormalEstimation(
+					"normals",
+					k_search=0,
+					radius_search=0.02)
 
 graph = [reader['output'] >> passthrough['input'],
-	passthrough[:] >> normals[:],
-	passthrough[:] >> viewer [:]
+	passthrough['output'] >> voxel_grid['input']
+	]
+
+region_growing = cloud_treatment.RegionGrowingCell(
+					"RegionGrowingCell",
+					min_cluster_size=500,
+					max_cluster_size=70000,
+					number_of_neighbours=30,
+					smoothness_threshold=6,
+					curvature_threshold=2)
+
+colorize = ecto_pcl.ColorizeClusters(
+					"colorize")
+
+graph += [
+	voxel_grid[:] >> normals_ecto[:],
+	voxel_grid[:] >> region_growing["input"],
+	normals_ecto[:] >> region_growing["normals"],
+	region_growing[:] >> colorize["clusters"],
+	voxel_grid[:] >> colorize["input"],
+	colorize[:] >> viewer[:]
 	]
 
 plasm = ecto.Plasm()

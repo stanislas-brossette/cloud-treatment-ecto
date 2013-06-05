@@ -7,7 +7,8 @@ OTHER_FILES += \
     var/CMakeLists.txt \
     bin/display_cloud.py \
     bin/testing_algo.py \
-    src/dirs.hh.in
+    src/dirs.hh.in \
+    bin/region_growing.py
 
 SOURCES += \
     src/cpp/cloud_treatment.cpp \
@@ -16,6 +17,7 @@ SOURCES += \
     src/cpp/cloudviewercell.cpp \
     src/cpp/passthroughcell.cpp \
     src/cpp/pcdreadercell.cpp \
-    src/cpp/regiongrowingcell.cpp
+    src/cpp/regiongrowingcell.cpp \
+    src/cpp/normalestimationcell.cpp
 
 HEADERS +=

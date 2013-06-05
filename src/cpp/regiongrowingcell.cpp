@@ -73,6 +73,7 @@ namespace cloud_treatment
 			number_of_neighbours_ = params["number_of_neighbours"];
 
 			clusters_ = outputs["clusters"];
+			clusters_->resize(0);
 		}
 
 		template <typename Point>
@@ -81,7 +82,6 @@ namespace cloud_treatment
 					boost::shared_ptr<const pcl::PointCloud<pcl::Normal > >& normals)
 		{
 			pcl::RegionGrowing<Point, pcl::Normal> reg;
-			clusters_->resize(0);
 
 			//Set the algorithm's parameters
 			reg.setMinClusterSize (*min_cluster_size_);
