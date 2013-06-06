@@ -11,6 +11,7 @@ ectomodule(cloud_treatment DESTINATION cloud_treatment_ecto INSTALL
     cpp/passthroughcell.cpp
     cpp/pcdreadercell.cpp
     cpp/regiongrowingcell.cpp
+    cpp/typedefs.h
     cpp/xyzswitchcell.cpp
 )
 

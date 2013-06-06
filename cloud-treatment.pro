@@ -21,4 +21,5 @@ SOURCES += \
     src/cpp/normalestimationcell.cpp \
     src/cpp/organizedmultiplanesegmentationcell.cpp
 
-HEADERS +=
+HEADERS += \
+    src/cpp/typedefs.h

@@ -10,12 +10,61 @@
 #include <ecto_pcl/ecto_pcl.hpp>
 #include <ecto_pcl/pcl_cell_with_normals.hpp>
 
+#include "typedefs.h"
+
+namespace implementation
+{
+	class add_regions_to_viewer_visitor
+		: public boost::static_visitor<>
+	{
+	public:
+		add_regions_to_viewer_visitor(boost::shared_ptr<pcl::visualization::PCLVisualizer> vis)
+			:vis_(vis)
+		{
+		}
+
+		template <typename T>
+		void operator()(std::vector<pcl::PlanarRegion<T>,
+				Eigen::aligned_allocator<pcl::PlanarRegion<T> > > & regions) const
+		{
+			char name[1024];
+			unsigned char red [6] = {255,   0,   0, 255, 255,   0};
+			unsigned char grn [6] = {  0, 255,   0, 255,   0, 255};
+			unsigned char blu [6] = {  0,   0, 255,   0, 255, 255};
+
+			typename pcl::PointCloud<T>::Ptr contour (
+						new pcl::PointCloud<T>);
+
+			for (size_t i = 0; i < regions.size (); i++)
+			{
+				Eigen::Vector3f centroid = regions.at(i).getCentroid ();
+				Eigen::Vector4f model = regions.at(i).getCoefficients ();
+				pcl::PointXYZ pt1 = pcl::PointXYZ (centroid[0], centroid[1], centroid[2]);
+				pcl::PointXYZ pt2 = pcl::PointXYZ (centroid[0] + (0.5f * model[0]),
+												   centroid[1] + (0.5f * model[1]),
+												   centroid[2] + (0.5f * model[2]));
+				sprintf (name, "normal_%d", unsigned (i));
+				vis_->addArrow (pt2, pt1, 1.0, 0, 0, false, name);
+
+				contour->points = regions.at(i).getContour ();
+				sprintf (name, "plane_%02d", int (i));
+				pcl::visualization::PointCloudColorHandlerCustom <T> color (
+							contour, red[i%6], grn[i%6], blu[i%6]);
+				if(!vis_->updatePointCloud(contour, color, name))
+					vis_->addPointCloud (contour, color, name);
+				vis_->setPointCloudRenderingProperties (
+							pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, name);
+			}
+		}
+
+	private:
+		boost::shared_ptr<pcl::visualization::PCLVisualizer> vis_;
+	};
+}
 namespace cloud_treatment
 {
 	struct OrganizedMultiPlaneSegmentationCell
 	{
-//		typedef std::vector<pcl::PlanarRegion<pcl::PointXYZ>, Eigen::aligned_allocator<pcl::PlanarRegion<pcl::PointXYZRGBNormal> > >  planar_regions;
-
 		static void declare_params(ecto::tendrils& params)
 		{
 			pcl::OrganizedMultiPlaneSegmentation<
@@ -55,9 +104,7 @@ namespace cloud_treatment
 
 		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
 		{
-			outputs.declare<ecto::pcl::PointCloud> ("output", "Filtered Cloud.");
-			outputs.declare<ecto::pcl::PointCloud> ("output_bis_", "Filtered Cloud.");
-//			outputs.declare< planar_regions > ("regions", "Segmented plane regions");
+			outputs.declare< planarRegions_t > ("regions", "Segmented plane regions");
 		}
 
 		void configure(const tendrils& params, const tendrils& inputs,
@@ -69,9 +116,7 @@ namespace cloud_treatment
 			maximum_curvature_ = params["maximum_curvature"];
 			use_planar_refinement_ = params["use_planar_refinement"];
 
-//			regions_ = outputs["regions"];
-			output_ = outputs["output"];
-			output_bis_ = outputs["output_bis_"];
+			regions_ = outputs["regions"];
 		}
 
 		template <typename Point>
@@ -108,48 +153,20 @@ namespace cloud_treatment
 				mps.segment (regions);//, model_coefficients, inlier_indices, labels, label_indices, boundary_indices);
 			}
 
+			*regions_ = regions;
 
 			boost::shared_ptr<pcl::visualization::PCLVisualizer> vis_ = boost::make_shared<pcl::visualization::PCLVisualizer> ("3D Viewer");
 			vis_->initCameraParameters ();
 			vis_->addPointCloud<Point> (input, "cloudname");
 			vis_->resetCameraViewpoint ("cloudname");
 
-			char name[1024];
-			unsigned char red [6] = {255,   0,   0, 255, 255,   0};
-			unsigned char grn [6] = {  0, 255,   0, 255,   0, 255};
-			unsigned char blu [6] = {  0,   0, 255,   0, 255, 255};
-
-			typename pcl::PointCloud<Point>::Ptr contour (new pcl::PointCloud<Point>);
-
-			for (size_t i = 0; i < regions.size (); i++)
-			{
-				Eigen::Vector3f centroid = regions[i].getCentroid ();
-				Eigen::Vector4f model = regions[i].getCoefficients ();
-				pcl::PointXYZ pt1 = pcl::PointXYZ (centroid[0], centroid[1], centroid[2]);
-				pcl::PointXYZ pt2 = pcl::PointXYZ (centroid[0] + (0.5f * model[0]),
-												   centroid[1] + (0.5f * model[1]),
-												   centroid[2] + (0.5f * model[2]));
-				sprintf (name, "normal_%d", unsigned (i));
-				vis_->addArrow (pt2, pt1, 1.0, 0, 0, false, name);
-
-				contour->points = regions[i].getContour ();
-				sprintf (name, "plane_%02d", int (i));
-				pcl::visualization::PointCloudColorHandlerCustom <Point> color (contour, red[i%6], grn[i%6], blu[i%6]);
-				if(!vis_->updatePointCloud(contour, color, name))
-					vis_->addPointCloud (contour, color, name);
-				vis_->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, name);
-			}
-
+			boost::apply_visitor( implementation::add_regions_to_viewer_visitor(vis_), *regions_ );
 
 			while (!vis_->wasStopped ())
 			{
 				vis_->spinOnce (100);
 				boost::this_thread::sleep (boost::posix_time::microseconds (1000));
 			}
-
-//			*regions_ = regions;
-			*output_ = ecto::pcl::xyz_cloud_variant_t(input);
-			*output_bis_ = ecto::pcl::xyz_cloud_variant_t(input);
 
 			return ecto::OK;
 		}
@@ -160,9 +177,7 @@ namespace cloud_treatment
 		ecto::spore<double> maximum_curvature_;
 		ecto::spore<bool> use_planar_refinement_;
 
-//		ecto::spore<planar_regions> regions_;
-		ecto::spore<ecto::pcl::PointCloud> output_;
-		ecto::spore<ecto::pcl::PointCloud> output_bis_;
+		ecto::spore<planarRegions_t> regions_;
 	};
 }
 
