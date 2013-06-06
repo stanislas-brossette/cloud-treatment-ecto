@@ -18,6 +18,7 @@ SOURCES += \
     src/cpp/passthroughcell.cpp \
     src/cpp/pcdreadercell.cpp \
     src/cpp/regiongrowingcell.cpp \
-    src/cpp/normalestimationcell.cpp
+    src/cpp/normalestimationcell.cpp \
+    src/cpp/organizedmultiplanesegmentationcell.cpp
 
 HEADERS +=

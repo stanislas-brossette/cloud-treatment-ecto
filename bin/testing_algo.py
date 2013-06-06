@@ -35,11 +35,20 @@ passthrough = cloud_treatment.PassThroughCell(
 normals = cloud_treatment.NormalEstimationCell(
 					"normals")
 
+multiplanesegmentation = cloud_treatment.OrganizedMultiPlaneSegmentationCell(
+					"multiplanesegmentation",
+					plane_min_inliers=1000,
+					plane_angular_threshold=3.0,
+					plane_distance_threshold=0.02,
+					use_planar_refinement=1
+					)
+
 colorize = ecto_pcl.ColorizeClusters("colorize")
 
 graph = [reader['output'] >> passthrough['input'],
 	passthrough[:] >> normals[:],
-	passthrough[:] >> viewer [:]
+	passthrough[:] >> multiplanesegmentation ['input'],
+	normals["normals"] >> multiplanesegmentation["normals"]
 	]
 
 plasm = ecto.Plasm()

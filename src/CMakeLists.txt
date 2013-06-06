@@ -7,6 +7,7 @@ ectomodule(cloud_treatment DESTINATION cloud_treatment_ecto INSTALL
     cpp/cloud_treatment.cpp
     cpp/cloudviewercell.cpp
     cpp/normalestimationcell.cpp
+    cpp/organizedmultiplanesegmentationcell.cpp
     cpp/passthroughcell.cpp
     cpp/pcdreadercell.cpp
     cpp/regiongrowingcell.cpp

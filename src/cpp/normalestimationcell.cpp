@@ -1,5 +1,4 @@
 #include <pcl/features/integral_image_normal.h>
-#include <pcl/visualization/pcl_visualizer.h>
 
 #include <ecto_pcl/ecto_pcl.hpp>
 #include <ecto_pcl/pcl_cell.hpp>

@@ -56,10 +56,12 @@ namespace cloud_treatment
 
 		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
 		{
-			outputs.declare<ecto::pcl::Clusters > ("clusters", "Clusters found by the algorithm");
+			outputs.declare<ecto::pcl::Clusters > ("clusters",
+												   "Clusters found by the algorithm");
 		}
 
-		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
+		void configure(const tendrils& params, const tendrils& inputs,
+					   const tendrils& outputs)
 		{
 			temp_normals_ = boost::make_shared<pcl::PointCloud< pcl::Normal> > ();
 			min_cluster_size_ = params["min_cluster_size"];
@@ -89,7 +91,8 @@ namespace cloud_treatment
 			reg.setSmoothModeFlag (*smooth_mode_flag_);
 			reg.setCurvatureTestFlag (*curvature_test_flag_);
 			reg.setResidualTestFlag (*residual_test_flag_);
-			reg.setSmoothnessThreshold (static_cast<float>(*smoothness_threshold_ / 180.0 * M_PI));
+			reg.setSmoothnessThreshold (static_cast<float>(
+											*smoothness_threshold_ / 180.0 * M_PI));
 			reg.setResidualThreshold (*residual_threshold_);
 			reg.setCurvatureThreshold (*curvature_threshold_);
 			reg.setNumberOfNeighbours (*number_of_neighbours_);
