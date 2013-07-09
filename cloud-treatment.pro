@@ -8,7 +8,11 @@ OTHER_FILES += \
     bin/display_cloud.py \
     bin/testing_algo.py \
     src/dirs.hh.in \
-    bin/region_growing.py
+    bin/region_growing.py \
+    bin/test_kinect.py \
+    bin/test_kinect_opencv.py \
+    bin/test_opennicapture.py \
+    bin/test_kinect_random.py
 
 SOURCES += \
     src/cpp/cloud_treatment.cpp \
@@ -19,7 +23,8 @@ SOURCES += \
     src/cpp/pcdreadercell.cpp \
     src/cpp/regiongrowingcell.cpp \
     src/cpp/normalestimationcell.cpp \
-    src/cpp/organizedmultiplanesegmentationcell.cpp
+    src/cpp/organizedmultiplanesegmentationcell.cpp \
+    src/cpp/organizedeuclidiansegmentationcell.cpp
 
 HEADERS += \
     src/cpp/typedefs.h

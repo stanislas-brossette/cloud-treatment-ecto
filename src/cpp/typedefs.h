@@ -1,6 +1,13 @@
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
 
+#include <boost/variant.hpp>
+
+#include <pcl/point_types.h>
+#include <pcl/segmentation/planar_region.h>
+
+//All usefull typedefs are defined here
+
 typedef boost::variant<
 	std::vector<pcl::PlanarRegion<pcl::PointXYZ>,
 		Eigen::aligned_allocator<pcl::PlanarRegion<pcl::PointXYZ> > >,

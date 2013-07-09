@@ -62,7 +62,7 @@ graph += [
 	normals_ecto[:] >> region_growing["normals"],
 	region_growing[:] >> colorize["clusters"],
 	voxel_grid[:] >> colorize["input"],
-	colorize[:] >> viewer[:]
+	colorize[:] >> viewer["input"]
 	]
 
 plasm = ecto.Plasm()

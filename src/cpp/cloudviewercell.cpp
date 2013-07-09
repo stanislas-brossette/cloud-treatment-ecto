@@ -33,6 +33,8 @@
 
 #include <boost/variant/get.hpp>
 
+#include "typedefs.h"
+
 namespace cloud_treatment
 {
 	struct CloudViewerCell
@@ -55,6 +57,8 @@ namespace cloud_treatment
 		declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
 		{
 			inputs.declare<ecto::pcl::PointCloud>("input", "The cloud to view");
+			inputs.declare< planarRegions_t > (
+						"regions", "Segmented plane regions").required(false);
 		}
 
 		void
@@ -125,7 +129,8 @@ namespace cloud_treatment
 			void
 			operator()(boost::shared_ptr<const CloudPOINTXYZRGBNORMAL>& cloud) const
 			{
-				std::cout << "CloudPOINTXYZRGBNORMAL->size() = " << cloud->size() << std::endl;
+				std::cout << "CloudPOINTXYZRGBNORMAL->size() = " << cloud->size() <<
+							 std::endl;
 				::pcl::visualization::PointCloudColorHandlerRGBField<
 						CloudPOINTXYZRGBNORMAL::PointType> rgb(cloud);
 				//::pcl::visualization::PointCloudGeometryHandlerSurfaceNormal<
@@ -139,25 +144,64 @@ namespace cloud_treatment
 				//          viewer->updatePointCloud(cloud,normals,key);
 			}
 
+			template <typename T>
+			void operator()(std::vector<pcl::PlanarRegion<T>,
+					Eigen::aligned_allocator<pcl::PlanarRegion<T> > > & regions) const
+			{
+				char name[1024];
+				unsigned char red [6] = {255,   0,   0, 255, 255,   0};
+				unsigned char grn [6] = {  0, 255,   0, 255,   0, 255};
+				unsigned char blu [6] = {  0,   0, 255,   0, 255, 255};
+
+				typename pcl::PointCloud<T>::Ptr contour (
+							new pcl::PointCloud<T>);
+
+				for (size_t i = 0; i < regions.size (); i++)
+				{
+					Eigen::Vector3f centroid = regions.at(i).getCentroid ();
+					Eigen::Vector4f model = regions.at(i).getCoefficients ();
+					pcl::PointXYZ pt1 = pcl::PointXYZ (centroid[0], centroid[1], centroid[2]);
+					pcl::PointXYZ pt2 = pcl::PointXYZ (centroid[0] + (0.5f * model[0]),
+													   centroid[1] + (0.5f * model[1]),
+													   centroid[2] + (0.5f * model[2]));
+					sprintf (name, "normal_region_%d", unsigned (i));
+					viewer->removeShape(name);
+					viewer->addArrow (pt2, pt1, 1.0, 0, 0, false, name);
+
+					contour->points = regions.at(i).getContour ();
+					sprintf (name, "plane_region_%02d", int (i));
+					pcl::visualization::PointCloudColorHandlerCustom <T> color (
+								contour, red[i%6], grn[i%6], blu[i%6]);
+					if(!viewer->updatePointCloud(contour, color, name))
+						viewer->addPointCloud (contour, color, name);
+					viewer->setPointCloudRenderingProperties (
+								pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, name);
+				}
+			}
+
 			boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
 			std::string key;
 		};
 		struct show_dispatch_runner
 		{
 			show_dispatch_runner(const show_dispatch& dispatch,
-								 const ecto::pcl::xyz_cloud_variant_t& varient)
+								 const ecto::pcl::xyz_cloud_variant_t& varient,
+								 const planarRegions_t planarRegions)
 				:
 				  dispatch(dispatch),
-				  varient(varient)
+				  varient(varient),
+				  planarRegions(planarRegions)
 			{
 			}
 			void
 			operator()()
 			{
 				boost::apply_visitor(dispatch, varient);
+				boost::apply_visitor(dispatch, planarRegions);
 			}
 			show_dispatch dispatch;
 			ecto::pcl::xyz_cloud_variant_t varient;
+			planarRegions_t planarRegions;
 		};
 
 		int
@@ -170,7 +214,8 @@ namespace cloud_treatment
 			}
 			if (!runner_thread_)
 			{
-				runner_thread_.reset(new boost::thread(boost::bind(&CloudViewerCell::run, this)));
+				runner_thread_.reset(new boost::thread(boost::bind(
+														   &CloudViewerCell::run, this)));
 			}
 			while (!viewer_)
 			{
@@ -181,10 +226,13 @@ namespace cloud_treatment
 				boost::mutex::scoped_lock lock(mtx);
 				ecto::pcl::PointCloud cloud = inputs.get<ecto::pcl::PointCloud>("input");
 				ecto::pcl::xyz_cloud_variant_t varient = cloud.make_variant();
+
+				planarRegions_t planarRegions = inputs.get<planarRegions_t>("regions");
+
 				show_dispatch dispatch(viewer_, "main cloud");
 				boost::shared_ptr<boost::signals2::scoped_connection> c(
 							new boost::signals2::scoped_connection);
-				*c = signal_.connect(show_dispatch_runner(dispatch, varient));
+				*c = signal_.connect(show_dispatch_runner(dispatch, varient, planarRegions));
 				jobs_.push_back(c);
 			}
 
@@ -211,4 +259,5 @@ namespace cloud_treatment
 
 }
 
-ECTO_CELL(cloud_treatment, cloud_treatment::CloudViewerCell, "CloudViewerCell", "Viewer of clouds");
+ECTO_CELL(cloud_treatment, cloud_treatment::CloudViewerCell,
+		  "CloudViewerCell", "Viewer of clouds");
