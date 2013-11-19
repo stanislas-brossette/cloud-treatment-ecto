@@ -102,7 +102,6 @@ namespace cloud_treatment
 			{
 			}
 
-			//http://pointclouds.org/documentation/tutorials/pcl_visualizer.php#pcl-visualizer
 			template<typename Point>
 			void
 			operator()(boost::shared_ptr<const ::pcl::PointCloud<Point> >& cloud) const

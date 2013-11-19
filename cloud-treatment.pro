@@ -23,8 +23,10 @@ SOURCES += \
     src/cpp/pcdreadercell.cpp \
     src/cpp/regiongrowingcell.cpp \
     src/cpp/normalestimationcell.cpp \
+    src/cpp/normalsegmentationcell.cpp \
     src/cpp/organizedmultiplanesegmentationcell.cpp \
-    src/cpp/organizedeuclidiansegmentationcell.cpp
+    src/cpp/organizedeuclidiansegmentationcell.cpp \
+    src/cpp/voxelgridcell.cpp
 
 HEADERS += \
     src/cpp/typedefs.h

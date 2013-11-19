@@ -51,7 +51,7 @@ region_growing = cloud_treatment.RegionGrowingCell(
 					max_cluster_size=70000,
 					number_of_neighbours=30,
 					smoothness_threshold=6,
-					curvature_threshold=2)
+					curvature_threshold=1)
 
 colorize = ecto_pcl.ColorizeClusters(
 					"colorize")

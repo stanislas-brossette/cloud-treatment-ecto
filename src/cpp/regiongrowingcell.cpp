@@ -107,6 +107,7 @@ namespace cloud_treatment
 			reg.setInputCloud(input);
 
 			reg.extract (*clusters_);
+			std::cout << "clusters_.size() = " << clusters_->size() << std::endl;
 
 			return ecto::OK;
 		}

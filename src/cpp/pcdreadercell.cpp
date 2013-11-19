@@ -45,7 +45,7 @@ namespace cloud_treatment
 		static void declare_params(tendrils& params)
 		{
 			params.declare<ecto::pcl::Format>("format", "Format of cloud found in PCD file.",
-											  ecto::pcl::FORMAT_XYZRGB);
+											  ecto::pcl::FORMAT_XYZRGBNORMAL);
 			params.declare<std::string> ("filename", "Name of the pcd file", "");
 		}
 
@@ -89,6 +89,18 @@ namespace cloud_treatment
 				if ( ::pcl::io::loadPCDFile< ::pcl::PointXYZRGB > (filePath, *cloud) == -1)
 				{
 					throw std::runtime_error("PCDReaderCell: failed to read PointXYZRGB cloud.");
+					return 1;
+				}
+				ecto::pcl::PointCloud p( cloud );
+				*output_ = p;
+			} break;
+			case ecto::pcl::FORMAT_XYZRGBNORMAL:
+			{
+				::pcl::PointCloud< ::pcl::PointXYZRGBNormal >::Ptr cloud (
+							new ::pcl::PointCloud< ::pcl::PointXYZRGBNormal >);
+				if ( ::pcl::io::loadPCDFile< ::pcl::PointXYZRGBNormal > (filePath, *cloud) == -1)
+				{
+					throw std::runtime_error("PCDReaderCell: failed to read PointXYZRGBNormal cloud.");
 					return 1;
 				}
 				ecto::pcl::PointCloud p( cloud );
