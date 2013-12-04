@@ -12,27 +12,12 @@ namespace cloud_treatment
 			::pcl::PassThrough< ::pcl::PointXYZ > default_;
 			params.declare<bool> ("keep_organized",
 					"To keep the point-cloud organized or not", false);
-	#if PCL_VERSION_COMPARE(<,1,6,0)
 			double x_min = -100;
 			double x_max = 100;
 			double y_min= -100;
 			double y_max = 100;
 			double z_min = -100;
 			double z_max = 100;
-			//default_.getFilterLimits(x_min, x_max);
-			//default_.getFilterLimits(y_min, y_max);
-			//default_.getFilterLimits(z_min, z_max);
-	#else
-			float x_min = -100;
-			float x_max = 100;
-			float y_min= -100;
-			float y_max = 100;
-			float z_min = -100;
-			float z_max = 100;
-			//default_.getFilterLimits(x_min, x_max);
-			//default_.getFilterLimits(y_min, y_max);
-			//default_.getFilterLimits(z_min, z_max);
-	#endif
 			params.declare<double> ("x_min",
 					"Minimum x value for the filter.", x_min);
 			params.declare<double> ("x_max",

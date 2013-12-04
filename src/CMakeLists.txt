@@ -14,6 +14,7 @@ ectomodule(cloud_treatment DESTINATION cloud_treatment_ecto INSTALL
     cpp/passthrough3dcell.cpp
     cpp/pcdreadercell.cpp
     cpp/regiongrowingcell.cpp
+    cpp/stepsegmentationcell.cpp
     cpp/typedefs.h
     cpp/voxelgridcell.cpp
     cpp/xyzswitchcell.cpp

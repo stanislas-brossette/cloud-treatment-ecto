@@ -72,7 +72,7 @@ namespace cloud_treatment
 		{
 			quit = false;
 			viewer_.reset(new pcl::visualization::PCLVisualizer(window_name));
-			viewer_->setBackgroundColor(255, 255, 255);
+			viewer_->setBackgroundColor(0, 0, 0);
 //			viewer_->addCoordinateSystem(0.25);
 			viewer_->initCameraParameters();
 
