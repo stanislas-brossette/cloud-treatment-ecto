@@ -25,7 +25,7 @@ reader = cloud_treatment.PCDReaderCell(
 
 viewer = cloud_treatment.CloudViewerCell(
 					"Viewer_ecto",
-					window_name="PCD Viewer")\
+					window_name="PCD Viewer")
 
 passthrough = cloud_treatment.PassThroughCell(
 					"passthrough",

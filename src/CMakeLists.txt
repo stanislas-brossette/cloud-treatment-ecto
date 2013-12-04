@@ -11,6 +11,7 @@ ectomodule(cloud_treatment DESTINATION cloud_treatment_ecto INSTALL
 #    cpp/organizedeuclidiansegmentationcell.cpp
     cpp/organizedmultiplanesegmentationcell.cpp
     cpp/passthroughcell.cpp
+    cpp/passthrough3dcell.cpp
     cpp/pcdreadercell.cpp
     cpp/regiongrowingcell.cpp
     cpp/typedefs.h

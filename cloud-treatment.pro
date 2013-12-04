@@ -26,7 +26,8 @@ SOURCES += \
     src/cpp/normalsegmentationcell.cpp \
     src/cpp/organizedmultiplanesegmentationcell.cpp \
     src/cpp/organizedeuclidiansegmentationcell.cpp \
-    src/cpp/voxelgridcell.cpp
+    src/cpp/voxelgridcell.cpp \
+    src/cpp/passthrough3dcell.cpp
 
 HEADERS += \
     src/cpp/typedefs.h

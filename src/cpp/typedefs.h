@@ -23,4 +23,6 @@ typedef boost::variant<
 		Eigen::aligned_allocator<pcl::PlanarRegion<pcl::PointNormal> > >
 	> planarRegions_t;
 
+
+
 #endif // TYPEDEFS_H
