@@ -9,7 +9,8 @@ namespace cloud_treatment
 		{
       int number_steps = 7;
       int number_visible_steps = 4;
-			double threshold = 0.01;
+			double positive_threshold = 0.01;
+			double negative_threshold = 0.01;
 			double z_step_1 = 0;
 			double z_step_2 = 0;
 			double z_step_3 = 0;
@@ -20,8 +21,10 @@ namespace cloud_treatment
       
 			params.declare<int> ("number_steps",	"Number of steps", number_steps);
 			params.declare<int> ("number_visible_steps",	"Number of visible steps", number_visible_steps);
-			params.declare<double> ("threshold",
-					"threshold for the segmentation of the ladder steps.", threshold);
+			params.declare<double> ("positive_threshold",
+					"positive threshold for the segmentation of the ladder steps.", positive_threshold);
+			params.declare<double> ("negative_threshold",
+					"negative threshold for the segmentation of the ladder steps.", negative_threshold);
 			params.declare<double> ("z_step_1",	"Altitude of the 1st step.", z_step_1);
 			params.declare<double> ("z_step_2",	"Altitude of the 2nd step.", z_step_2);
 			params.declare<double> ("z_step_3",	"Altitude of the 3rd step.", z_step_3);
@@ -40,7 +43,8 @@ namespace cloud_treatment
 		{
       number_steps_ = params["number_steps"];
       number_visible_steps_ = params["number_visible_steps"];
-			threshold_ = params["threshold"];
+			positive_threshold_ = params["positive_threshold"];
+			negative_threshold_ = params["negative_threshold"];
 			z_step_1_ = params["z_step_1"];
 			z_step_2_ = params["z_step_2"];
 			z_step_3_ = params["z_step_3"];
@@ -59,7 +63,6 @@ namespace cloud_treatment
 		{
       clusters_->clear(); 
       clusters_->resize(static_cast<std::size_t>(*number_steps_));
-      std::cout << "Processing Step Seg" << std::endl;
       std::vector<double> z_steps;
       z_steps.push_back(*z_step_1_ );
       z_steps.push_back(*z_step_2_ );
@@ -72,8 +75,8 @@ namespace cloud_treatment
       {
         for (std::size_t s = 0; s < z_steps.size(); s++)
         {
-          if (input->points[i].z < z_steps[s] + *threshold_ &&
-              input->points[i].z > z_steps[s] - *threshold_)
+          if (input->points[i].z < z_steps[s] + *positive_threshold_ &&
+              input->points[i].z > z_steps[s] - *negative_threshold_)
           {
             clusters_->at(s).indices.push_back(static_cast<int>(i));
             break;
@@ -85,7 +88,8 @@ namespace cloud_treatment
 
     ecto::spore<int> number_steps_;
     ecto::spore<int> number_visible_steps_;
-		ecto::spore<double> threshold_;
+		ecto::spore<double> positive_threshold_;
+		ecto::spore<double> negative_threshold_;
 		ecto::spore<double> z_step_1_;
 		ecto::spore<double> z_step_2_;
 		ecto::spore<double> z_step_3_;
