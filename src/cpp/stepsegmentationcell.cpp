@@ -71,6 +71,8 @@ namespace cloud_treatment
       z_steps.push_back(*z_step_5_ );
       z_steps.push_back(*z_step_6_ );
       z_steps.push_back(*z_step_7_ );
+      std::vector<Point> centroids;
+      centroids.resize(*number_steps_);
       for (std::size_t i = 0; i < input->size(); ++i)
       {
         for (std::size_t s = 0; s < z_steps.size(); s++)
@@ -79,9 +81,19 @@ namespace cloud_treatment
               input->points[i].z > z_steps[s] - *negative_threshold_)
           {
             clusters_->at(s).indices.push_back(static_cast<int>(i));
+            centroids[s].x += input->points[i].x;
+            centroids[s].y += input->points[i].y;
+            centroids[s].z += input->points[i].z;
             break;
           }
         }
+      }
+      for (std::size_t s = 0; s < z_steps.size(); s++)
+      {
+        centroids[s].x = centroids[s].x/clusters_->at(s).indices.size();
+        centroids[s].y = centroids[s].y/clusters_->at(s).indices.size();
+        centroids[s].z = centroids[s].z/clusters_->at(s).indices.size();
+        std::cout << "centroid step " << s << ": " << centroids[s] << std::endl; 
       }
 			return ecto::OK;
 		}
