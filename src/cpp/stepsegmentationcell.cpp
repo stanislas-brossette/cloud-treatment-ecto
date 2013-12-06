@@ -1,6 +1,8 @@
 #include <ecto_pcl/ecto_pcl.hpp>
 #include <ecto_pcl/pcl_cell.hpp>
 
+#include "typedefs.h" 
+
 namespace cloud_treatment
 {
 	struct StepSegmentationCell
@@ -37,6 +39,8 @@ namespace cloud_treatment
 		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
 		{
 			outputs.declare<ecto::pcl::Clusters> ("clusters", "Extracted clusters");
+      outputs.declare<point_list_t > (
+                          "centroids", "Centroids of the extracted clusters");
 		}
 
 		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
@@ -55,6 +59,8 @@ namespace cloud_treatment
 
 			clusters_ = outputs["clusters"];
       clusters_->resize(static_cast<std::size_t>(*number_steps_));
+			centroids_ = outputs["centroids"];
+      centroids_->resize(static_cast<std::size_t>(*number_steps_));
 		}
 
 		template <typename Point>
@@ -63,6 +69,8 @@ namespace cloud_treatment
 		{
       clusters_->clear(); 
       clusters_->resize(static_cast<std::size_t>(*number_steps_));
+      centroids_->clear(); 
+      centroids_->resize(static_cast<std::size_t>(*number_steps_));
       std::vector<double> z_steps;
       z_steps.push_back(*z_step_1_ );
       z_steps.push_back(*z_step_2_ );
@@ -71,29 +79,26 @@ namespace cloud_treatment
       z_steps.push_back(*z_step_5_ );
       z_steps.push_back(*z_step_6_ );
       z_steps.push_back(*z_step_7_ );
-      std::vector<Point> centroids;
-      centroids.resize(*number_steps_);
       for (std::size_t i = 0; i < input->size(); ++i)
       {
-        for (std::size_t s = 0; s < z_steps.size(); s++)
+        for (std::size_t s = 0; s < z_steps.size(); ++s)
         {
           if (input->points[i].z < z_steps[s] + *positive_threshold_ &&
               input->points[i].z > z_steps[s] - *negative_threshold_)
           {
             clusters_->at(s).indices.push_back(static_cast<int>(i));
-            centroids[s].x += input->points[i].x;
-            centroids[s].y += input->points[i].y;
-            centroids[s].z += input->points[i].z;
+            centroids_->at(s).x += input->points[i].x;
+            centroids_->at(s).y += input->points[i].y;
+            centroids_->at(s).z += input->points[i].z;
             break;
           }
         }
       }
       for (std::size_t s = 0; s < z_steps.size(); s++)
       {
-        centroids[s].x = centroids[s].x/clusters_->at(s).indices.size();
-        centroids[s].y = centroids[s].y/clusters_->at(s).indices.size();
-        centroids[s].z = centroids[s].z/clusters_->at(s).indices.size();
-        std::cout << "centroid step " << s << ": " << centroids[s] << std::endl; 
+        centroids_->at(s).x = centroids_->at(s).x/clusters_->at(s).indices.size();
+        centroids_->at(s).y = centroids_->at(s).y/clusters_->at(s).indices.size();
+        centroids_->at(s).z = centroids_->at(s).z/clusters_->at(s).indices.size();
       }
 			return ecto::OK;
 		}
@@ -110,6 +115,7 @@ namespace cloud_treatment
 		ecto::spore<double> z_step_6_;
 		ecto::spore<double> z_step_7_;
 		ecto::spore<ecto::pcl::Clusters> clusters_;
+    ecto::spore<point_list_t > centroids_;
 	};
 }
 

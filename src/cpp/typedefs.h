@@ -23,6 +23,8 @@ typedef boost::variant<
 		Eigen::aligned_allocator<pcl::PlanarRegion<pcl::PointNormal> > >
 	> planarRegions_t;
 
+typedef	std::vector< ::pcl::PointXYZ, 
+        Eigen::aligned_allocator< ::pcl::PointXYZ > > point_list_t;
 
 
 #endif // TYPEDEFS_H
