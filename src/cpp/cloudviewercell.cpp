@@ -26,12 +26,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+#include <Eigen/Core>
 
-#include <ecto_pcl/ecto_pcl.hpp>
+#include <boost/variant/get.hpp>
+#include <boost/format.hpp>
+
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
-#include <boost/variant/get.hpp>
+#include <ecto_pcl/ecto_pcl.hpp>
 
 #include "typedefs.h"
 
@@ -59,6 +62,10 @@ namespace cloud_treatment
 			inputs.declare<ecto::pcl::PointCloud>("input", "The cloud to view");
 			inputs.declare< planarRegions_t > (
 						"regions", "Segmented plane regions").required(false);
+			inputs.declare< std::vector < Eigen::Vector4f> > (
+						"VIPoints", "List of important points to display in big red").required(false);
+			inputs.declare<std::vector< std::vector<Eigen::Vector3f> > > (
+						"rectangles", "List of rectangles to plot ").required(false);
 		}
 
 		void
@@ -66,6 +73,8 @@ namespace cloud_treatment
 				  const tendrils& outputs)
 		{
 			params["window_name"] >> window_name;
+      spheresCreated_ = 0;
+      rectanglesCreated_ = 0;
 		}
 		void
 		run()
@@ -143,6 +152,7 @@ namespace cloud_treatment
 				//          viewer->updatePointCloud(cloud,normals,key);
 			}
 
+
 			template <typename T>
 			void operator()(std::vector<pcl::PlanarRegion<T>,
 					Eigen::aligned_allocator<pcl::PlanarRegion<T> > > & regions) const
@@ -187,20 +197,20 @@ namespace cloud_treatment
 								 const ecto::pcl::xyz_cloud_variant_t& varient,
 								 const planarRegions_t planarRegions)
 				:
-				  dispatch(dispatch),
-				  varient(varient),
-				  planarRegions(planarRegions)
+				  dispatch_(dispatch),
+				  varient_(varient),
+				  planarRegions_(planarRegions)
 			{
 			}
 			void
 			operator()()
 			{
-				boost::apply_visitor(dispatch, varient);
-				boost::apply_visitor(dispatch, planarRegions);
+				boost::apply_visitor(dispatch_, varient_);
+				boost::apply_visitor(dispatch_, planarRegions_);
 			}
-			show_dispatch dispatch;
-			ecto::pcl::xyz_cloud_variant_t varient;
-			planarRegions_t planarRegions;
+			show_dispatch dispatch_;
+			ecto::pcl::xyz_cloud_variant_t varient_;
+			planarRegions_t planarRegions_;
 		};
 
 		int
@@ -228,6 +238,54 @@ namespace cloud_treatment
 
 				planarRegions_t planarRegions = inputs.get<planarRegions_t>("regions");
 
+        std::vector < Eigen::Vector4f> VIPoints; 
+        VIPoints = inputs.get<std::vector < Eigen::Vector4f> > ("VIPoints");
+        std::vector< std::vector<Eigen::Vector3f> > rectangles_; 
+        rectangles_ = 
+          inputs.get< std::vector< std::vector<Eigen::Vector3f> > > ("rectangles");
+        
+        //Add the VIPoints as spheres
+        boost::format fmt("sphere%d");
+        for(std::size_t i = 0; i < VIPoints.size(); ++i)
+        {
+          ::pcl::PointXYZ sphereCenter = ::pcl::PointXYZ(VIPoints[i].x(),
+                                                         VIPoints[i].y(),
+                                                         VIPoints[i].z());
+          fmt % i;
+          if( i+1 > spheresCreated_)
+          {
+            viewer_->addSphere(sphereCenter, 0.015, 255, 0, 0, fmt.str());
+            spheresCreated_ = i+1;
+          }
+          else
+            viewer_->updateSphere(sphereCenter, 0.01, 255, 0, 0, fmt.str());
+        }
+        //Add the rectangles representing the spheres 
+        boost::format fmtline("line%d %d");
+        for (std::size_t i = 0; i < rectangles_.size(); ++i)
+        {
+          ::pcl::PointXYZ point0 = ::pcl::PointXYZ(rectangles_[i][0].x(),
+                                                   rectangles_[i][0].y(),
+                                                   rectangles_[i][0].z());
+          ::pcl::PointXYZ point1 = ::pcl::PointXYZ(rectangles_[i][1].x(),
+                                                   rectangles_[i][1].y(),
+                                                   rectangles_[i][1].z());
+          ::pcl::PointXYZ point2 = ::pcl::PointXYZ(rectangles_[i][2].x(),
+                                                   rectangles_[i][2].y(),
+                                                   rectangles_[i][2].z());
+          ::pcl::PointXYZ point3 = ::pcl::PointXYZ(rectangles_[i][3].x(),
+                                                   rectangles_[i][3].y(),
+                                                   rectangles_[i][3].z());
+          if( i+1 > rectanglesCreated_)
+          {
+            viewer_->addLine(point0, point1, (fmtline % i % 0).str());
+            viewer_->addLine(point1, point2, (fmtline % i % 1).str());
+            viewer_->addLine(point2, point3, (fmtline % i % 2).str());
+            viewer_->addLine(point3, point0, (fmtline % i % 3).str());
+            rectanglesCreated_++;
+          }
+        }
+
 				show_dispatch dispatch(viewer_, "main cloud");
 				boost::shared_ptr<boost::signals2::scoped_connection> c(
 							new boost::signals2::scoped_connection);
@@ -254,6 +312,8 @@ namespace cloud_treatment
 		std::vector<boost::shared_ptr<boost::signals2::scoped_connection> > jobs_;
 		boost::mutex mtx;
 		bool quit;
+    int spheresCreated_;
+    int rectanglesCreated_;
 	};
 
 }
