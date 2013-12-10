@@ -74,7 +74,6 @@ namespace cloud_treatment
 		{
 			params["window_name"] >> window_name;
       spheresCreated_ = 0;
-      rectanglesCreated_ = 0;
 		}
 		void
 		run()
@@ -260,32 +259,44 @@ namespace cloud_treatment
           else
             viewer_->updateSphere(sphereCenter, 0.01, 255, 0, 0, fmt.str());
         }
-        //Add the rectangles representing the spheres 
+        //Add the rectangles representing the steps 
         boost::format fmtline("line%d %d");
         for (std::size_t i = 0; i < rectangles_.size(); ++i)
         {
-          ::pcl::PointXYZ point0 = ::pcl::PointXYZ(rectangles_[i][0].x(),
-                                                   rectangles_[i][0].y(),
-                                                   rectangles_[i][0].z());
-          ::pcl::PointXYZ point1 = ::pcl::PointXYZ(rectangles_[i][1].x(),
-                                                   rectangles_[i][1].y(),
-                                                   rectangles_[i][1].z());
-          ::pcl::PointXYZ point2 = ::pcl::PointXYZ(rectangles_[i][2].x(),
-                                                   rectangles_[i][2].y(),
-                                                   rectangles_[i][2].z());
-          ::pcl::PointXYZ point3 = ::pcl::PointXYZ(rectangles_[i][3].x(),
-                                                   rectangles_[i][3].y(),
-                                                   rectangles_[i][3].z());
-          if( i+1 > rectanglesCreated_)
+          if(rectanglesCreated_.size() < i+1 || rectanglesMemory_[i] != rectangles_[i][0].x())
           {
+            if(rectanglesCreated_.size() < i+1)
+            {
+              rectanglesCreated_.push_back(false);
+              rectanglesMemory_.push_back(99999.);
+            }  
+            rectanglesMemory_[i] = rectangles_[i][0].x();
+            ::pcl::PointXYZ point0 = ::pcl::PointXYZ(rectangles_[i][0].x(),
+                                                     rectangles_[i][0].y(),
+                                                     rectangles_[i][0].z());
+            ::pcl::PointXYZ point1 = ::pcl::PointXYZ(rectangles_[i][1].x(),
+                                                     rectangles_[i][1].y(),
+                                                     rectangles_[i][1].z());
+            ::pcl::PointXYZ point2 = ::pcl::PointXYZ(rectangles_[i][2].x(),
+                                                     rectangles_[i][2].y(),
+                                                     rectangles_[i][2].z());
+            ::pcl::PointXYZ point3 = ::pcl::PointXYZ(rectangles_[i][3].x(),
+                                                     rectangles_[i][3].y(),
+                                                     rectangles_[i][3].z());
+            if(rectanglesCreated_[i])
+            {
+              viewer_->removeShape((fmtline % i % 0).str());
+              viewer_->removeShape((fmtline % i % 1).str());
+              viewer_->removeShape((fmtline % i % 2).str());
+              viewer_->removeShape((fmtline % i % 3).str());
+            }
             viewer_->addLine(point0, point1, (fmtline % i % 0).str());
             viewer_->addLine(point1, point2, (fmtline % i % 1).str());
             viewer_->addLine(point2, point3, (fmtline % i % 2).str());
             viewer_->addLine(point3, point0, (fmtline % i % 3).str());
-            rectanglesCreated_++;
+            rectanglesCreated_[i] = true;
           }
         }
-
 				show_dispatch dispatch(viewer_, "main cloud");
 				boost::shared_ptr<boost::signals2::scoped_connection> c(
 							new boost::signals2::scoped_connection);
@@ -313,7 +324,8 @@ namespace cloud_treatment
 		boost::mutex mtx;
 		bool quit;
     int spheresCreated_;
-    int rectanglesCreated_;
+    std::vector<bool> rectanglesCreated_;
+    std::vector<double> rectanglesMemory_;
 	};
 
 }
