@@ -40,8 +40,8 @@ stepsegmenter = cloud_treatment.StepSegmentationCell("Step_Seg",
                 z_step_5=1.21,
                 z_step_6=1.52,
                 z_step_7=1.83,
-                positive_threshold=0.0,
-                negative_threshold=0.03
+                positive_threshold=0.01,
+                negative_threshold=0.0
                 )
 
 principalcomponent = cloud_treatment.PrincipalComponentExtractionCell(

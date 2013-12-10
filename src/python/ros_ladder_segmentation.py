@@ -10,6 +10,8 @@ import argparse
 
 import cloud_treatment_ecto.cloud_treatment as cloud_treatment
 
+ecto_ros.init(sys.argv, "locate_ladder")
+
 parser = argparse.ArgumentParser(description='Treatment that segments the'
                 'ladder steps from the rest on the scene')
 scheduler_options(parser)
@@ -25,8 +27,8 @@ reader = cloud_treatment.PCDReaderCell(	"Reader_ecto",
 					filename=pcdfilename)
 
 cloud_sub = ecto_sensor_msgs.Subscriber_PointCloud2("cloud_sub",
-    topic_name='/atlas/lidar/points')
-msg2cloud = ecto_pcl_ros.Message2PointCloud("msg2cloud", format=ecto_pcl.XYZ)
+    topic_name='/camera/depth/points')
+msg2cloud = ecto_pcl_ros.Message2PointCloud("msg2cloud", format=ecto_pcl.XYZRGB)
 
 passthrough3d = cloud_treatment.PassThrough3DCell(
 					"passthrough3D",
@@ -88,8 +90,6 @@ graph = [cloud_sub["output"] >> msg2cloud[:],
 
 plasm = ecto.Plasm()
 plasm.connect(graph)
-
-ecto_ros.init(sys.argv, "locate_ladder_from_lidar")
 
 run_plasm(options, plasm, locals=vars())
 #plasm.execute()
