@@ -78,7 +78,6 @@ namespace cloud_treatment
 					throw std::runtime_error("PCDReaderCell: failed to read PointXYZ cloud.");
 					return 1;
 				}
-				std::cout << "Made it this far" << std::endl;
 				ecto::pcl::PointCloud p( cloud );
 				*output_ = p;
 			} break;
