@@ -2,6 +2,7 @@
 
 import ecto, ecto_pcl, ecto_ros, ecto_pcl_ros
 import ecto_ros.ecto_sensor_msgs as ecto_sensor_msgs
+import ecto_ros.ecto_geometry_msgs as ecto_geometry_msgs
 from ecto.opts import scheduler_options, run_plasm
 import sys
 import time
@@ -35,6 +36,10 @@ cloud_pub_main = ecto_sensor_msgs.Publisher_PointCloud2(
                    "cloud_pub_main",topic_name='/ecto/main_cloud')
 cloud_pub_seg = ecto_sensor_msgs.Publisher_PointCloud2(
                    "cloud_pub_seg",topic_name='/ecto/seg_cloud')
+
+rectangle2msg = cloud_treatment.RectanglesPubCell("rectangle2msg")
+rectpub = ecto_geometry_msgs.Publisher_PolygonStamped("rectpub", 
+                                 topic_name='/ecto/polygon')
 
 passthrough3d = cloud_treatment.PassThrough3DCell(
 					"passthrough3D",
@@ -78,6 +83,8 @@ graph = [cloud_sub["output"] >> msg2cloud[:],
          passthrough3d["output"] >> colorize["input"], 
          stepsegmenter["clusters"] >> principalcomponent["clusters"],
          passthrough3d["output"] >> principalcomponent["input"],  
+         principalcomponent["rectangles"] >> rectangle2msg[:],
+         rectangle2msg["rectanglemsg0"] >> rectpub[:],
          #colorize[:] >> viewer["input"]
          passthrough3d["output"] >> cloud2msg_main[:],
          cloud2msg_main[:] >> cloud_pub_main[:],
