@@ -27,7 +27,7 @@ reader = cloud_treatment.PCDReaderCell(	"Reader_ecto",
 					filename=pcdfilename)
 
 cloud_sub = ecto_sensor_msgs.Subscriber_PointCloud2("cloud_sub",
-    topic_name='/camera/depth/points')
+    topic_name='/worldmodel_main/pointcloud_vis')
 msg2cloud = ecto_pcl_ros.Message2PointCloud("msg2cloud", format=ecto_pcl.XYZRGB)
 
 passthrough3d = cloud_treatment.PassThrough3DCell(
@@ -47,8 +47,8 @@ stepsegmenter = cloud_treatment.StepSegmentationCell("Step_Seg",
                 z_step_5=1.21,
                 z_step_6=1.52,
                 z_step_7=1.83,
-                positive_threshold=0.0,
-                negative_threshold=0.03
+                positive_threshold=0.01,
+                negative_threshold=0.0
                 )
 
 principalcomponent = cloud_treatment.PrincipalComponentExtractionCell(
@@ -74,17 +74,8 @@ graph = [cloud_sub["output"] >> msg2cloud[:],
          passthrough3d["output"] >> principalcomponent["input"], 
          colorize[:] >> viewer["input"]
 	]
-#graph = [reader["output"] >> passthrough3d["input"],
-#         passthrough3d["output"] >> stepsegmenter["input"],
-#         principalcomponent["centroids"] >> viewer["VIPoints"],
-#         principalcomponent["rectangles"] >> viewer["rectangles"],
-#         stepsegmenter["clusters"] >> colorize["clusters"],
-#         passthrough3d["output"] >> colorize["input"], 
-#         stepsegmenter["clusters"] >> principalcomponent["clusters"],
-#         passthrough3d["output"] >> principalcomponent["input"], 
-#         colorize[:] >> viewer["input"]
-#	]
-#graph = [reader["output"] >> passthrough3d["input"],
+#graph = [cloud_sub["output"] >> msg2cloud[:],
+#         msg2cloud[:] >> passthrough3d["input"],
 #         passthrough3d["output"] >> viewer["input"]
 #	]
 
