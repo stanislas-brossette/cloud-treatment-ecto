@@ -66,6 +66,9 @@ namespace cloud_treatment
 
       for(std::size_t i = 0; i < clusters_->size(); ++i)
       {
+        if(clusters_->at(i).indices.size() < 3)
+          continue;
+
         boost::shared_ptr< ::pcl::PointCloud<Point> > cloud;
         cloud = boost::make_shared< ::pcl::PointCloud<Point> > ();
         // extract indices into a cloud
