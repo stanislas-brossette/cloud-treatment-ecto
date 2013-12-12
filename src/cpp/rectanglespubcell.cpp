@@ -32,14 +32,6 @@ namespace cloud_treatment
                                      "rectanglemsg4", "rectanglemsg4");
 			outputs.declare<boost::shared_ptr<geometry_msgs::PolygonStamped const> > (
                                      "rectanglemsg5", "rectanglemsg5");
-			outputs.declare<boost::shared_ptr<geometry_msgs::PolygonStamped const> > (
-                                     "rectanglemsg6", "rectanglemsg6");
-			outputs.declare<boost::shared_ptr<geometry_msgs::PolygonStamped const> > (
-                                     "rectanglemsg7", "rectanglemsg7");
-			outputs.declare<boost::shared_ptr<geometry_msgs::PolygonStamped const> > (
-                                     "rectanglemsg8", "rectanglemsg8");
-			outputs.declare<boost::shared_ptr<geometry_msgs::PolygonStamped const> > (
-                                     "rectanglemsg9", "rectanglemsg9");
 		}
 
 		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
@@ -51,10 +43,6 @@ namespace cloud_treatment
 			rectanglemsg3_ = outputs["rectanglemsg3"];
 			rectanglemsg4_ = outputs["rectanglemsg4"];
 			rectanglemsg5_ = outputs["rectanglemsg5"];
-			rectanglemsg6_ = outputs["rectanglemsg6"];
-			rectanglemsg7_ = outputs["rectanglemsg7"];
-			rectanglemsg8_ = outputs["rectanglemsg8"];
-			rectanglemsg9_ = outputs["rectanglemsg9"];
 		}
 
      boost::shared_ptr<geometry_msgs::PolygonStamped const> fillPolygonStamped(
@@ -76,7 +64,11 @@ namespace cloud_treatment
 		int process(const tendrils& inputs, const tendrils& outputs)
 		{
       *rectanglemsg0_ = fillPolygonStamped(rectangles_->at(0));      
-      std::cout << (*rectanglemsg0_)->polygon.points.size();
+      *rectanglemsg1_ = fillPolygonStamped(rectangles_->at(1));      
+      *rectanglemsg2_ = fillPolygonStamped(rectangles_->at(2));      
+      *rectanglemsg3_ = fillPolygonStamped(rectangles_->at(3));      
+      *rectanglemsg4_ = fillPolygonStamped(rectangles_->at(4));      
+      *rectanglemsg5_ = fillPolygonStamped(rectangles_->at(5));      
 			return ecto::OK;
 		}
     ecto::spore< std::vector< std::vector<Eigen::Vector3f> > > rectangles_;
@@ -86,10 +78,6 @@ namespace cloud_treatment
     ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg3_;
     ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg4_;
     ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg5_;
-    ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg6_;
-    ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg7_;
-    ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg8_;
-    ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg9_;
 	};
 }
 
