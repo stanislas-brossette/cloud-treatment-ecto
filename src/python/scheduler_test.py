@@ -37,9 +37,18 @@ cloud_pub_main = ecto_sensor_msgs.Publisher_PointCloud2(
 cloud_pub_seg = ecto_sensor_msgs.Publisher_PointCloud2(
                    "cloud_pub_seg",topic_name='/ecto/seg_cloud')
 
+recalibrate2msg = cloud_treatment.RecalibrateMsgCell("recalMsgEnv",
+                                                     choice_index=2)
+poseStamped_pub = ecto_geometry_msgs.Publisher_PoseStamped("poseStamped_pub",
+                                             topic_name="/ecto/poseStamped")
+
 rectangle2msg = cloud_treatment.RectanglesPubCell("rectangle2msg")
-rectpub = ecto_geometry_msgs.Publisher_PolygonStamped("rectpub", 
-                                 topic_name='/ecto/polygon')
+rectpub0=ecto_geometry_msgs.Publisher_PolygonStamped("rectpub0",topic_name='/ecto/polygon0')
+rectpub1=ecto_geometry_msgs.Publisher_PolygonStamped("rectpub1",topic_name='/ecto/polygon1')
+rectpub2=ecto_geometry_msgs.Publisher_PolygonStamped("rectpub2",topic_name='/ecto/polygon2')
+rectpub3=ecto_geometry_msgs.Publisher_PolygonStamped("rectpub3",topic_name='/ecto/polygon3')
+rectpub4=ecto_geometry_msgs.Publisher_PolygonStamped("rectpub4",topic_name='/ecto/polygon4')
+rectpub5=ecto_geometry_msgs.Publisher_PolygonStamped("rectpub5",topic_name='/ecto/polygon5')
 
 passthrough3d = cloud_treatment.PassThrough3DCell(
 					"passthrough3D",
@@ -48,16 +57,16 @@ passthrough3d = cloud_treatment.PassThrough3DCell(
           y_min=-1.9,
           y_max=-0.5,
           z_min=-1.0,
-          z_max=5.0)
+          z_max=3.0)
 
 stepsegmenter = cloud_treatment.StepSegmentationCell("Step_Seg",
                 z_step_1=-0.06,
                 z_step_2=0.23,
-                z_step_3=0.52,
+                z_step_3=0.53,
                 z_step_4=0.82,
-                z_step_5=1.21,
-                z_step_6=1.52,
-                z_step_7=1.83,
+                z_step_5=1.12,
+                z_step_6=1.43,
+                z_step_7=1.81,
                 positive_threshold=0.01,
                 negative_threshold=0.0
                 )
@@ -84,7 +93,15 @@ graph = [cloud_sub["output"] >> msg2cloud[:],
          stepsegmenter["clusters"] >> principalcomponent["clusters"],
          passthrough3d["output"] >> principalcomponent["input"],  
          principalcomponent["rectangles"] >> rectangle2msg[:],
-         rectangle2msg["rectanglemsg0"] >> rectpub[:],
+         principalcomponent["eigenvectors"] >> recalibrate2msg["frames"],
+         principalcomponent["centroids"] >> recalibrate2msg["origins"],
+         recalibrate2msg[:] >> poseStamped_pub[:],
+         rectangle2msg["rectanglemsg0"] >> rectpub0[:],
+         rectangle2msg["rectanglemsg1"] >> rectpub1[:],
+         rectangle2msg["rectanglemsg2"] >> rectpub2[:],
+         rectangle2msg["rectanglemsg3"] >> rectpub3[:],
+         rectangle2msg["rectanglemsg4"] >> rectpub4[:],
+         rectangle2msg["rectanglemsg5"] >> rectpub5[:],
          #colorize[:] >> viewer["input"]
          passthrough3d["output"] >> cloud2msg_main[:],
          cloud2msg_main[:] >> cloud_pub_main[:],
