@@ -5,11 +5,13 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     ${catkin_INCLUDE_DIRS}
                     ${rosbuild_msgs_INCLUDE_DIRS}
                     ${geometry_msgs_INCLUDE_DIRS}
+                    ${sensor_msgs_INCLUDE_DIRS}
                     ${roscpp_INCLUDE_DIRS})
 
 ectomodule(cloud_treatment DESTINATION cloud_treatment_ecto INSTALL
     cpp/cloud_treatment.cpp
     cpp/cloudviewercell.cpp
+    cpp/extractheadercell.cpp
     cpp/normalestimationcell.cpp
     cpp/normalsegmentationcell.cpp
 #    cpp/organizedeuclidiansegmentationcell.cpp
@@ -30,8 +32,6 @@ ectomodule(cloud_treatment DESTINATION cloud_treatment_ecto INSTALL
 link_ecto(cloud_treatment
   ${PCL_LIBRARIES}
   ${roscpp_LIBRARIES}
-  #${geometry_msgs_LIBRARIES}
-  #  ${rosbuild_msgs_LIBRARIES}
 )
 INSTALL(FILES cloud_treatment_ecto/__init__.py
   DESTINATION "${PYTHON_INSTALL_DIR}/cloud_treatment_ecto")

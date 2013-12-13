@@ -28,36 +28,65 @@ namespace cloud_treatment
 		{
       inputs.declare<std::vector<Eigen::Matrix3f > > ("frames", "list of frames");
       inputs.declare<std::vector<Eigen::Vector4f > > ("origins", "list of origins");
+      inputs.declare<std_msgs::Header > ("header", "Header");
       outputs.declare<boost::shared_ptr<geometry_msgs::PoseStamped const> > (
                                                                       "pose_stamped_msg", 
                                                                       "pose message to publish");
+      outputs.declare<boost::shared_ptr<std_msgs::String const> > ("surf_name",
+                                                                  "Name of the surface");
 		}
 
 		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
 		{
+      header_ = inputs["header"];
       origins_ = inputs["origins"];
       frames_ = inputs["frames"];
       pose_stamped_msg_ = outputs["pose_stamped_msg"];
+      surf_name_ = outputs["surf_name"];
       choice_index_ = params["choice_index"];
 		}
 
+    Eigen::Matrix3f reOrganizeFrame(const Eigen::Matrix3f& frame)
+    {
+      Eigen::Matrix3f output;
+
+      if(frame.col(0).dot(Eigen::Vector3f(-1.0, 0.0, 0.0)) < 0)
+        output.col(0) = -frame.col(0);
+      else
+        output.col(0) = frame.col(0);
+
+      if(frame.col(1).dot(Eigen::Vector3f(0.0, -1.0, 0.0)) < 0)
+        output.col(1) = -frame.col(1);
+      else
+        output.col(1) = frame.col(1);
+
+      output.col(2) = output.col(0).cross(output.col(1));
+
+      return output;
+    }
 
 		int process(const tendrils& inputs, const tendrils& outputs)
 		{
       geometry_msgs::PoseStamped poseStamped;
-      poseStamped.header.frame_id = "world";
+      poseStamped.header = *header_; 
       poseStamped.pose.position.x = origins_->at(*choice_index_).x();
       poseStamped.pose.position.y = origins_->at(*choice_index_).y();
       poseStamped.pose.position.z = origins_->at(*choice_index_).z();
-      Eigen::Quaternionf quaternion (frames_->at(*choice_index_));
+      Eigen::Matrix3f frame = reOrganizeFrame(frames_->at(*choice_index_));
+      Eigen::Quaternionf quaternion (frame);
       poseStamped.pose.orientation.x = quaternion.x(); 
       poseStamped.pose.orientation.y = quaternion.y(); 
       poseStamped.pose.orientation.z = quaternion.z(); 
       poseStamped.pose.orientation.w = quaternion.w(); 
       *pose_stamped_msg_ = 
                boost::make_shared<geometry_msgs::PoseStamped const>(poseStamped); 
-      std::cout << "position:\n" << (*pose_stamped_msg_)->pose.position << std::endl;
-      std::cout << "orientation:\n" <<(*pose_stamped_msg_)->pose.orientation << std::endl;
+      std_msgs::String surf_name;
+      if(*choice_index_ == 0)
+        surf_name.data = "Floor";
+      else
+        surf_name.data = "Step" + boost::lexical_cast<std::string>(*choice_index_);
+      *surf_name_ = boost::make_shared<std_msgs::String const> (surf_name);
+
 			return ecto::OK;
 		}
     ecto::spore< boost::shared_ptr<geometry_msgs::PoseStamped const> > pose_stamped_msg_;
@@ -65,6 +94,8 @@ namespace cloud_treatment
     ecto::spore< std::string > topic_name_;
     ecto::spore< std::vector< Eigen::Vector4f > > origins_;
     ecto::spore< std::vector< Eigen::Matrix3f > > frames_; 
+    ecto::spore< std_msgs::Header > header_;  
+    ecto::spore<boost::shared_ptr<std_msgs::String const> > surf_name_;
 	};
 }
 

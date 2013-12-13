@@ -6,7 +6,7 @@ include(cmake/portability.cmake)
 project(cloud_treatment_ecto)
 
 find_package(catkin REQUIRED)
-find_package(catkin REQUIRED roscpp geometry_msgs rosbuild_msgs)
+find_package(catkin REQUIRED roscpp sensor_msgs geometry_msgs rosbuild_msgs)
 find_package(ecto REQUIRED)
 find_package(ecto_pcl REQUIRED)
 find_package(ecto_ros REQUIRED)
