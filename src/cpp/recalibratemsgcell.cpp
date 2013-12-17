@@ -86,7 +86,6 @@ namespace cloud_treatment
       else
         surf_name.data = "Step" + boost::lexical_cast<std::string>(*choice_index_);
       *surf_name_ = boost::make_shared<std_msgs::String const> (surf_name);
-
 			return ecto::OK;
 		}
     ecto::spore< boost::shared_ptr<geometry_msgs::PoseStamped const> > pose_stamped_msg_;

@@ -20,6 +20,7 @@ namespace cloud_treatment
 		{
       inputs.declare<std::vector< std::vector<Eigen::Vector3f> > > (
                                      "rectangles", "rectangles");
+      inputs.declare<std_msgs::Header > ("header", "Header");
 			outputs.declare<boost::shared_ptr<geometry_msgs::PolygonStamped const> > (
                                      "rectanglemsg0", "rectanglemsg0");
 			outputs.declare<boost::shared_ptr<geometry_msgs::PolygonStamped const> > (
@@ -36,6 +37,7 @@ namespace cloud_treatment
 
 		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
 		{
+      header_ = inputs["header"];
       rectangles_ = inputs["rectangles"];
 			rectanglemsg0_ = outputs["rectanglemsg0"];
 			rectanglemsg1_ = outputs["rectanglemsg1"];
@@ -49,7 +51,7 @@ namespace cloud_treatment
                            const std::vector<Eigen::Vector3f>& rectangle)
     {
       geometry_msgs::PolygonStamped Polygon;
-      Polygon.header.frame_id = "/world";
+      Polygon.header = *header_; 
       geometry_msgs::Point32 point;
       for(std::size_t i = 0; i < rectangle.size()+1; ++i)
       {
@@ -78,6 +80,7 @@ namespace cloud_treatment
     ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg3_;
     ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg4_;
     ecto::spore< boost::shared_ptr<geometry_msgs::PolygonStamped const> > rectanglemsg5_;
+    ecto::spore< std_msgs::Header > header_;  
 	};
 }
 

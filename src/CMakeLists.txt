@@ -11,6 +11,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
 ectomodule(cloud_treatment DESTINATION cloud_treatment_ecto INSTALL
     cpp/cloud_treatment.cpp
     cpp/cloudviewercell.cpp
+    cpp/editheadercell.cpp
     cpp/extractheadercell.cpp
     cpp/normalestimationcell.cpp
     cpp/normalsegmentationcell.cpp
@@ -23,6 +24,7 @@ ectomodule(cloud_treatment DESTINATION cloud_treatment_ecto INSTALL
     cpp/rectanglespubcell.cpp
     cpp/regiongrowingcell.cpp
     cpp/recalibratemsgcell.cpp
+    cpp/stepcenteringcell.cpp
     cpp/stepsegmentationcell.cpp
     cpp/typedefs.h
     cpp/voxelgridcell.cpp
