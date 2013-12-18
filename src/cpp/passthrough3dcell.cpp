@@ -32,12 +32,14 @@ namespace cloud_treatment
 					"Minimum z value for the filter.", z_max);
 		}
 
-		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
+		static void declare_io(const tendrils& params, 
+                           tendrils& inputs, tendrils& outputs)
 		{
 			outputs.declare<ecto::pcl::PointCloud> ("output", "Filtered Cloud.");
 		}
 
-		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
+		void configure(const tendrils& params, 
+                   const tendrils& inputs, const tendrils& outputs)
 		{
 			x_min_ = params["x_min"];
 			x_max_ = params["x_max"];
@@ -60,7 +62,8 @@ namespace cloud_treatment
 			filterX.setFilterLimits(*x_min_, *x_max_);
 			//filterX.setKeepOrganized(keep_organized_);
 			filterX.setInputCloud(input);
-			typename ::pcl::PointCloud<Point>::Ptr cloudX(new typename ::pcl::PointCloud<Point>);
+			typename ::pcl::PointCloud<Point>::Ptr cloudX(
+                                new typename ::pcl::PointCloud<Point>);
 			filterX.filter(*cloudX);
 			cloudX->header = input->header;
 
@@ -68,9 +71,9 @@ namespace cloud_treatment
       ::pcl::PassThrough<Point> filterY;
 			filterY.setFilterFieldName("y");
 			filterY.setFilterLimits(*y_min_, *y_max_);
-			//filterY.setKeepOrganized(keep_organized_);
 			filterY.setInputCloud(cloudX);
-			typename ::pcl::PointCloud<Point>::Ptr cloudXY(new typename ::pcl::PointCloud<Point>);
+			typename ::pcl::PointCloud<Point>::Ptr cloudXY(
+                                new typename ::pcl::PointCloud<Point>);
 			filterY.filter(*cloudXY);
 			cloudXY->header = input->header;
 
@@ -78,9 +81,9 @@ namespace cloud_treatment
       ::pcl::PassThrough<Point> filterZ;
 			filterZ.setFilterFieldName("z");
 			filterZ.setFilterLimits(*z_min_, *z_max_);
-			//filterX.setKeepOrganized(keep_organized_);
 			filterZ.setInputCloud(cloudXY);
-			typename ::pcl::PointCloud<Point>::Ptr cloudXYZ(new typename ::pcl::PointCloud<Point>);
+			typename ::pcl::PointCloud<Point>::Ptr cloudXYZ(
+                                new typename ::pcl::PointCloud<Point>);
 			filterZ.filter(*cloudXYZ);
 			cloudXYZ->header = input->header;
 
@@ -102,6 +105,7 @@ namespace cloud_treatment
 
 
 
-ECTO_CELL(cloud_treatment, ecto::pcl::PclCell<cloud_treatment::PassThrough3DCell>,
-		  "PassThrough3DCell", "3D PassThrough filter");
+ECTO_CELL(cloud_treatment, 
+          ecto::pcl::PclCell<cloud_treatment::PassThrough3DCell>,
+		      "PassThrough3DCell", "3D PassThrough filter");
 
