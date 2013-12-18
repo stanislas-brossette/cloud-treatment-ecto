@@ -6,6 +6,8 @@
 #include <pcl/point_types.h>
 #include <pcl/segmentation/planar_region.h>
 
+#include <sensor_msgs/PointCloud2.h>
+
 //All usefull typedefs are defined here
 
 typedef boost::variant<
@@ -26,5 +28,7 @@ typedef boost::variant<
 typedef	std::vector< ::pcl::PointXYZ, 
         Eigen::aligned_allocator< ::pcl::PointXYZ > > point_list_t;
 
+typedef sensor_msgs::PointCloud2 PointCloud2_t;
+typedef boost::shared_ptr< sensor_msgs::PointCloud2 const> PointCloud2_Ptr_t;
 
 #endif // TYPEDEFS_H

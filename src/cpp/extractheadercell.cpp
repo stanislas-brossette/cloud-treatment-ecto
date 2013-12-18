@@ -4,6 +4,8 @@
 
 #include <ecto/ecto.hpp>
 
+#include "typedefs.h"
+
 using ecto::tendrils;
 namespace cloud_treatment
 {
@@ -14,15 +16,17 @@ namespace cloud_treatment
 		{
 		}
 
-		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
+		static void declare_io(const tendrils& params, 
+                           tendrils& inputs, tendrils& outputs)
 		{
-      inputs.declare<boost::shared_ptr<sensor_msgs::PointCloud2 const> > (
-                                                           "pointcloud2msg", 
-                                                           "pointCloud2 message");
-      outputs.declare<std_msgs::Header > ("header", "extracted header message");
+      inputs.declare<PointCloud2_Ptr_t> ("pointcloud2msg", 
+                                         "pointCloud2 message");
+      outputs.declare<std_msgs::Header > ("header", 
+                                          "extracted header message");
 		}
 
-		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
+		void configure(const tendrils& params, 
+                   const tendrils& inputs, const tendrils& outputs)
 		{
       input_ = inputs["pointcloud2msg"];
       output_ = outputs["header"];
@@ -33,7 +37,7 @@ namespace cloud_treatment
       *output_ = (*input_)->header; 
 			return ecto::OK;
 		}
-    ecto::spore<boost::shared_ptr<sensor_msgs::PointCloud2 const> > input_;
+    ecto::spore<PointCloud2_Ptr_t > input_;
     ecto::spore<std_msgs::Header > output_;
 	};
 }

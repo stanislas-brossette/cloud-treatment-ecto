@@ -61,20 +61,20 @@ edit_header = cloud_treatment.EditHeaderCell('editHeader', frame_id="/map")
 ### CLOUD TREATMENTS ###
 passthrough3d = cloud_treatment.PassThrough3DCell(
                 "passthrough3D",
-                x_min=-0.5,
+                x_min=-1.0,
                 x_max=1.0,
-                y_min=-2.5,
-                y_max=2.0,
+                y_min=-5.0,
+                y_max=-3.0,
                 z_min=-1.0,
                 z_max=2.5)
 stepsegmenter = cloud_treatment.StepSegmentationCell("Step_Seg",
                 z_step_1=0.0,
-                z_step_2=0.31,
-                z_step_3=0.61,
-                z_step_4=0.91,
-                z_step_5=1.21,
-                z_step_6=1.51,
-                z_step_7=1.81,
+                z_step_2=0.30,
+                z_step_3=0.60,
+                z_step_4=0.90,
+                z_step_5=1.20,
+                z_step_6=1.50,
+                z_step_7=1.80,
                 positive_threshold=0.01,
                 negative_threshold=0.0
                 )
