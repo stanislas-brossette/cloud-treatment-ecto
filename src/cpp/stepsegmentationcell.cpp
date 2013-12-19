@@ -24,11 +24,14 @@ namespace cloud_treatment
       double optim_number_of_iter = 10;
       
 			params.declare<int> ("number_steps",	"Number of steps", number_steps);
-			params.declare<int> ("number_visible_steps",	"Number of visible steps", number_visible_steps);
+			params.declare<int> ("number_visible_steps",	
+                           "Number of visible steps", number_visible_steps);
 			params.declare<double> ("positive_threshold",
-					"positive threshold for the segmentation of the ladder steps.", positive_threshold);
+					    "positive threshold for the segmentation of the ladder steps.", 
+              positive_threshold);
 			params.declare<double> ("negative_threshold",
-					"negative threshold for the segmentation of the ladder steps.", negative_threshold);
+					    "negative threshold for the segmentation of the ladder steps.", 
+              negative_threshold);
 			params.declare<double> ("z_step_1",	"Altitude of the 1st step", z_step_1);
 			params.declare<double> ("z_step_2",	"Altitude of the 2nd step", z_step_2);
 			params.declare<double> ("z_step_3",	"Altitude of the 3rd step", z_step_3);
@@ -37,19 +40,23 @@ namespace cloud_treatment
 			params.declare<double> ("z_step_6",	"Altitude of the 6th step", z_step_6);
 			params.declare<double> ("z_step_7",	"Altitude of the 7th step", z_step_7);
 			params.declare<double> ("optim_precision",
-                              "Precision of the steps of the optim", optim_precision);
+                              "Precision of the steps of the optim", 
+                              optim_precision);
 			params.declare<double> ("optim_number_of_iter", 
-                              "number of iter of the optim", optim_number_of_iter);
+                              "number of iter of the optim", 
+                              optim_number_of_iter);
 		}
 
-		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
+		static void declare_io(const tendrils& params, 
+                           tendrils& inputs, tendrils& outputs)
 		{
 			outputs.declare<ecto::pcl::Clusters> ("clusters", "Extracted clusters");
       outputs.declare<point_list_t > (
                           "centroids", "Centroids of the extracted clusters");
 		}
 
-		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
+		void configure(const tendrils& params, 
+                   const tendrils& inputs, const tendrils& outputs)
 		{
       number_steps_ = params["number_steps"];
       number_visible_steps_ = params["number_visible_steps"];
@@ -96,7 +103,8 @@ namespace cloud_treatment
       }
 
       std::vector< std::vector<int> > numberInliers(
-                         z_steps.size(), std::vector<int>(optim_heights_.size(), 0));   
+                         z_steps.size(), 
+                         std::vector<int>(optim_heights_.size(), 0));   
       
       for (std::size_t i = 0; i < input->size(); ++i)
       {
@@ -106,7 +114,8 @@ namespace cloud_treatment
           for(std::size_t n = 0; n < optim_heights_.size(); ++n)
           {
             if(input->points[i].z > z_steps[s]+optim_heights_[n] &&
-                input->points[i].z < z_steps[s]+optim_heights_[n]+*optim_precision_)
+                input->points[i].z < 
+                z_steps[s]+optim_heights_[n]+*optim_precision_)
             {
               numberInliers[s][n] = numberInliers[s][n] + 1;
             }
@@ -126,9 +135,12 @@ namespace cloud_treatment
       }
       for (std::size_t s = 0; s < z_steps.size(); s++)
       {
-        centroids_->at(s).x = centroids_->at(s).x/clusters_->at(s).indices.size();
-        centroids_->at(s).y = centroids_->at(s).y/clusters_->at(s).indices.size();
-        centroids_->at(s).z = centroids_->at(s).z/clusters_->at(s).indices.size();
+        centroids_->at(s).x = 
+          centroids_->at(s).x/clusters_->at(s).indices.size();
+        centroids_->at(s).y = 
+          centroids_->at(s).y/clusters_->at(s).indices.size();
+        centroids_->at(s).z = 
+          centroids_->at(s).z/clusters_->at(s).indices.size();
       }
 
       for(std::size_t s = 0; s < numberInliers.size(); ++s)
@@ -137,9 +149,11 @@ namespace cloud_treatment
         std::size_t maxIndex = 0;
         for(std::size_t i = 0; i < numberInliers[s].size(); ++i)
         {
-          maxIndex = (numberInliers[s][i] > numberInliers[s][maxIndex]) ? i : maxIndex;
+          maxIndex = (numberInliers[s][i] > 
+                      numberInliers[s][maxIndex]) ? i : maxIndex;
         }
-        std::cout << "maxIndex=" << maxIndex << " value=" <<z_steps[s]+optim_heights_[maxIndex]; 
+        std::cout << "maxIndex=" << maxIndex << 
+          " value=" <<z_steps[s]+optim_heights_[maxIndex]; 
         std::cout << std::endl;
       }
 
@@ -167,6 +181,7 @@ namespace cloud_treatment
 
 
 
-ECTO_CELL(cloud_treatment, ecto::pcl::PclCell<cloud_treatment::StepSegmentationCell>,
-		  "StepSegmentationCell", "Step Segmentation Cell");
+ECTO_CELL(cloud_treatment, 
+          ecto::pcl::PclCell<cloud_treatment::StepSegmentationCell>,
+		      "StepSegmentationCell", "Step Segmentation Cell");
 

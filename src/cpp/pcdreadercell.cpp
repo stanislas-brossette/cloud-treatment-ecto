@@ -44,24 +44,29 @@ namespace cloud_treatment
 
 		static void declare_params(tendrils& params)
 		{
-			params.declare<ecto::pcl::Format>("format", "Format of cloud found in PCD file.",
-											  ecto::pcl::FORMAT_XYZRGB);
+			params.declare<ecto::pcl::Format>("format", 
+                                        "Format of cloud found in PCD file.",
+											                  ecto::pcl::FORMAT_XYZRGB);
 			params.declare<std::string> ("filename", "Name of the pcd file", "");
 		}
 
-		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
+		static void declare_io(const tendrils& params, 
+                           tendrils& inputs, tendrils& outputs)
 		{
-			outputs.declare<ecto::pcl::PointCloud>("output", "A point cloud from the pcd file.");
+			outputs.declare<ecto::pcl::PointCloud>("output", 
+                                             "A point cloud from the pcd file."
+                                             );
 		}
 
-		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
+    void configure(const tendrils& params, 
+                   const tendrils& inputs, const tendrils& outputs)
 		{
 			output_ = outputs["output"];
 			format_ = params["format"];
 			filename_ = params["filename"];
 		}
 
-		int process(const tendrils& /*inputs*/, const tendrils& outputs)
+		int process(const tendrils& inputs, const tendrils& outputs)
 		{
 			if (!first)
 				return ecto::OK;
@@ -72,10 +77,11 @@ namespace cloud_treatment
 			case ecto::pcl::FORMAT_XYZ:
 			{
 				::pcl::PointCloud< ::pcl::PointXYZ >::Ptr cloud (
-							new ::pcl::PointCloud< ::pcl::PointXYZ >);
-				if ( ::pcl::io::loadPCDFile< ::pcl::PointXYZ >(filePath, *cloud) == -1)
+							new ::pcl::PointCloud< ::pcl::PointXYZ>);
+				if ( ::pcl::io::loadPCDFile< ::pcl::PointXYZ>(filePath, *cloud) == -1)
 				{
-					throw std::runtime_error("PCDReaderCell: failed to read PointXYZ cloud.");
+					throw std::runtime_error("PCDReaderCell: "
+                                   "failed to read PointXYZ cloud.");
 					return 1;
 				}
 				ecto::pcl::PointCloud p( cloud );
@@ -87,7 +93,8 @@ namespace cloud_treatment
 							new ::pcl::PointCloud< ::pcl::PointXYZRGB >);
 				if ( ::pcl::io::loadPCDFile< ::pcl::PointXYZRGB > (filePath, *cloud) == -1)
 				{
-					throw std::runtime_error("PCDReaderCell: failed to read PointXYZRGB cloud.");
+					throw std::runtime_error("PCDReaderCell: "
+                                   "failed to read PointXYZRGB cloud.");
 					return 1;
 				}
 				ecto::pcl::PointCloud p( cloud );
@@ -97,9 +104,11 @@ namespace cloud_treatment
 			{
 				::pcl::PointCloud< ::pcl::PointXYZRGBNormal >::Ptr cloud (
 							new ::pcl::PointCloud< ::pcl::PointXYZRGBNormal >);
-				if ( ::pcl::io::loadPCDFile< ::pcl::PointXYZRGBNormal > (filePath, *cloud) == -1)
+				if ( ::pcl::io::loadPCDFile< ::pcl::PointXYZRGBNormal > (
+                                                       filePath, *cloud) == -1)
 				{
-					throw std::runtime_error("PCDReaderCell: failed to read PointXYZRGBNormal cloud.");
+					throw std::runtime_error("PCDReaderCell: "
+                                   "failed to read PointXYZRGBNormal cloud.");
 					return 1;
 				}
 				ecto::pcl::PointCloud p( cloud );
@@ -112,7 +121,8 @@ namespace cloud_treatment
 							new ::pcl::PointCloud< ::pcl::PointXYZI >);
 				if ( ::pcl::io::loadPCDFile< ::pcl::PointXYZI > (filePath, *cloud) == -1)
 				{
-					throw std::runtime_error("PCDReaderCell: failed to read PointXYZI cloud.");
+					throw std::runtime_error("PCDReaderCell: "
+                                   "failed to read PointXYZI cloud.");
 					return 1;
 				}
 				ecto::pcl::PointCloud p( cloud );
@@ -158,4 +168,5 @@ namespace cloud_treatment
 
 }
 
-ECTO_CELL(cloud_treatment, cloud_treatment::PCDReaderCell, "PCDReaderCell", "Read a cloud from a PCD file");
+ECTO_CELL(cloud_treatment, cloud_treatment::PCDReaderCell, 
+          "PCDReaderCell", "Read a cloud from a PCD file");

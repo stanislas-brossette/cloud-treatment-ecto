@@ -25,7 +25,8 @@ namespace cloud_treatment
                                    "Centers of the clusters");
 		}
 
-		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
+		void configure(const tendrils& params, 
+                   const tendrils& inputs, const tendrils& outputs)
 		{
       clusters_ = inputs["clusters"];
       frames_ = inputs["frames"];
@@ -35,7 +36,7 @@ namespace cloud_treatment
 
 		template <typename Point>
 		int process(const tendrils& inputs, const tendrils& outputs,
-					boost::shared_ptr<const ::pcl::PointCloud<Point> >& input)
+					      boost::shared_ptr<const ::pcl::PointCloud<Point> >& input)
 		{
       centers_->clear();
       centers_->resize(static_cast<std::size_t>(clusters_->size()));
@@ -59,15 +60,18 @@ namespace cloud_treatment
         filter.setIndices( ::pcl::PointIndicesPtr(
         new ::pcl::PointIndices ((*clusters_)[i])) );
         filter.filter(*cloud);
-        Eigen::Vector3f point(cloud->points[0].x, cloud->points[0].y, cloud->points[0].z);
-        Eigen::Vector3f minPoint(cloud->points[0].x, cloud->points[0].y, cloud->points[0].z);
+        Eigen::Vector3f point(cloud->points[0].x, 
+                              cloud->points[0].y, cloud->points[0].z);
+        Eigen::Vector3f minPoint(cloud->points[0].x, 
+                                 cloud->points[0].y, cloud->points[0].z);
         double firstMin = point.dot(firstAxis);
         double firstMax = point.dot(firstAxis);
         double secondMin = point.dot(secondAxis);
         double secondMax = point.dot(secondAxis);
         for(std::size_t p = 0; p < cloud->points.size(); ++p)
         {
-          point = Eigen::Vector3f(cloud->points[p].x, cloud->points[p].y, cloud->points[p].z);
+          point = Eigen::Vector3f(cloud->points[p].x, 
+                                  cloud->points[p].y, cloud->points[p].z);
           if(point.dot(firstAxis) > firstMax)
           {
             firstMax = point.dot(firstAxis);
@@ -90,7 +94,10 @@ namespace cloud_treatment
         Eigen::Vector3f Center = minPoint + 
                              ((firstMax-firstMin)/2)*firstAxis + 
                              ((secondMax-secondMin)/2)*secondAxis;
-        centers_->at(i) = Eigen::Vector4f(Center.x(), Center.y(), Center.z(), 0.0); 
+        centers_->at(i) = Eigen::Vector4f(Center.x(), 
+                                          Center.y(), 
+                                          Center.z(), 
+                                          0.0); 
       }
       
 			return ecto::OK;
@@ -104,5 +111,6 @@ namespace cloud_treatment
 
 
 
-ECTO_CELL(cloud_treatment, ecto::pcl::PclCell<cloud_treatment::StepCenteringCell>,
-		  "StepCenteringCell", "Computes the center of the steps");
+ECTO_CELL(cloud_treatment, 
+          ecto::pcl::PclCell<cloud_treatment::StepCenteringCell>,
+		      "StepCenteringCell", "Computes the center of the steps");

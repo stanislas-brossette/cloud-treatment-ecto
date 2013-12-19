@@ -108,4 +108,3 @@ namespace cloud_treatment
 ECTO_CELL(cloud_treatment, 
           ecto::pcl::PclCell<cloud_treatment::PassThrough3DCell>,
 		      "PassThrough3DCell", "3D PassThrough filter");
-

@@ -17,26 +17,34 @@ namespace cloud_treatment
 {
 	struct RecalibrateMsgCell
 	{
+    typedef boost::shared_ptr<
+                   geometry_msgs::PoseStamped const> PoseStampedPtr_t; 
+    typedef boost::shared_ptr<
+                   std_msgs::String const> StringMsgsPtr_t; 
 
 		static void declare_params(tendrils& params)
 		{
       std::size_t choice_index;
-			params.declare<std::size_t> ("choice_index", "Item of the list to publish", choice_index);
+			params.declare<std::size_t> ("choice_index", 
+                                   "Item of the list to publish", choice_index);
 		}
 
-		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
+		static void declare_io(const tendrils& params, 
+                           tendrils& inputs, tendrils& outputs)
 		{
-      inputs.declare<std::vector<Eigen::Matrix3f > > ("frames", "list of frames");
-      inputs.declare<std::vector<Eigen::Vector4f > > ("origins", "list of origins");
+      inputs.declare<std::vector<Eigen::Matrix3f > > ("frames", 
+                                                      "list of frames");
+      inputs.declare<std::vector<Eigen::Vector4f > > ("origins", 
+                                                      "list of origins");
       inputs.declare<std_msgs::Header > ("header", "Header");
-      outputs.declare<boost::shared_ptr<geometry_msgs::PoseStamped const> > (
-                                                                      "pose_stamped_msg", 
-                                                                      "pose message to publish");
-      outputs.declare<boost::shared_ptr<std_msgs::String const> > ("surf_name",
-                                                                  "Name of the surface");
+      outputs.declare<PoseStampedPtr_t > ("pose_stamped_msg", 
+                                          "pose message to publish");
+      outputs.declare<StringMsgsPtr_t > ("surf_name",
+                                         "Name of the surface");
 		}
 
-		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
+		void configure(const tendrils& params, 
+                   const tendrils& inputs, const tendrils& outputs)
 		{
       header_ = inputs["header"];
       origins_ = inputs["origins"];
@@ -79,16 +87,17 @@ namespace cloud_treatment
       poseStamped.pose.orientation.z = quaternion.z(); 
       poseStamped.pose.orientation.w = quaternion.w(); 
       *pose_stamped_msg_ = 
-               boost::make_shared<geometry_msgs::PoseStamped const>(poseStamped); 
+            boost::make_shared<geometry_msgs::PoseStamped const>(poseStamped); 
       std_msgs::String surf_name;
       if(*choice_index_ == 0)
         surf_name.data = "Floor";
       else
-        surf_name.data = "Step" + boost::lexical_cast<std::string>(*choice_index_);
+        surf_name.data = "Step" + boost::lexical_cast<std::string>(
+                                                              *choice_index_);
       *surf_name_ = boost::make_shared<std_msgs::String const> (surf_name);
 			return ecto::OK;
 		}
-    ecto::spore< boost::shared_ptr<geometry_msgs::PoseStamped const> > pose_stamped_msg_;
+    ecto::spore< PoseStampedPtr_t> pose_stamped_msg_;
     ecto::spore< std::size_t > choice_index_;
     ecto::spore< std::string > topic_name_;
     ecto::spore< std::vector< Eigen::Vector4f > > origins_;
@@ -99,5 +108,5 @@ namespace cloud_treatment
 }
 
 ECTO_CELL(cloud_treatment, cloud_treatment::RecalibrateMsgCell,
-		  "RecalibrateMsgCell", "Publishes a ros message with origin and frame that can be used for recalibration");
-
+		  "RecalibrateMsgCell", "Publishes a ros message with origin and"
+      "frame that can be used for recalibration");

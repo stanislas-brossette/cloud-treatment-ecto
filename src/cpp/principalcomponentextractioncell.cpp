@@ -18,21 +18,26 @@ namespace cloud_treatment
 		{
       double length_rectangles = 0;
       double width_rectangles = 0;
-      params.declare<double>("length_rectangles", "length of the rectangles", length_rectangles);
-      params.declare<double>("width_rectangles", "width of the rectangles", width_rectangles);
+      params.declare<double>("length_rectangles", 
+                             "length of the rectangles", length_rectangles);
+      params.declare<double>("width_rectangles", 
+                             "width of the rectangles", width_rectangles);
 		}
 
-		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
+		static void declare_io(const tendrils& params, 
+                           tendrils& inputs, tendrils& outputs)
 		{
 			inputs.declare<ecto::pcl::Clusters> ("clusters", "Extracted clusters");
       outputs.declare<std::vector< Eigen::Matrix3f > > ("eigenvectors", 
-                                                       "List of eigen vectors of the clusters");
-      outputs.declare<std::vector< Eigen::Vector4f > > ("centroids", "Centroids of the clusters");
+                                   "List of eigen vectors of the clusters");
+      outputs.declare<std::vector< Eigen::Vector4f > > ("centroids", 
+                                   "Centroids of the clusters");
       outputs.declare<std::vector< std::vector<Eigen::Vector3f> > > ("rectangles", 
-                                                        "Rectangles representing steps in clusters");
+                                   "Rectangles representing steps in clusters");
 		}
 
-		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
+		void configure(const tendrils& params, 
+                   const tendrils& inputs, const tendrils& outputs)
 		{
       length_rectangles_ = params["length_rectangles"];
       width_rectangles_ = params["width_rectangles"];
@@ -88,11 +93,11 @@ namespace cloud_treatment
                                                  pca.getMean().y(),
                                                  pca.getMean().z());
         Eigen::Vector3f longAxis = Eigen::Vector3f(pca.getEigenVectors()(0,0),
-                                                   pca.getEigenVectors()(1,0),
-                                                   pca.getEigenVectors()(2,0));
+                                                 pca.getEigenVectors()(1,0),
+                                                 pca.getEigenVectors()(2,0));
         Eigen::Vector3f shortAxis = Eigen::Vector3f(pca.getEigenVectors()(0,1),
-                                                    pca.getEigenVectors()(1,1),
-                                                    pca.getEigenVectors()(2,1));
+                                                 pca.getEigenVectors()(1,1),
+                                                 pca.getEigenVectors()(2,1));
         longAxis.normalize();
         longAxis = (*length_rectangles_)*longAxis;        
         shortAxis.normalize();
@@ -119,5 +124,7 @@ namespace cloud_treatment
 
 
 
-ECTO_CELL(cloud_treatment, ecto::pcl::PclCell<cloud_treatment::PrincipalComponentExtractionCell>,
-		  "PrincipalComponentExtractionCell", "Cell that extracts the principal components of clouds");
+ECTO_CELL(cloud_treatment, 
+          ecto::pcl::PclCell<cloud_treatment::PrincipalComponentExtractionCell>,
+		      "PrincipalComponentExtractionCell", 
+          "Cell that extracts the principal components of clouds");

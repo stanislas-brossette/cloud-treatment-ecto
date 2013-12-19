@@ -12,13 +12,9 @@ namespace cloud_treatment
 			::pcl::PassThrough< ::pcl::PointXYZ > default_;
 			params.declare<std::string> ("filter_field_name",
 										 "The name of the field to use for filtering.", "");
-	#if PCL_VERSION_COMPARE(<,1,6,0)
-			double filter_limit_min, filter_limit_max;
-			default_.getFilterLimits(filter_limit_min, filter_limit_max);
-	#else
 			float filter_limit_min, filter_limit_max;
 			default_.getFilterLimits(filter_limit_min, filter_limit_max);
-	#endif
+
 			params.declare<double> ("filter_limit_min",
 									"Minimum value for the filter.", filter_limit_min);
 			params.declare<double> ("filter_limit_max",
@@ -30,12 +26,14 @@ namespace cloud_treatment
 								  "To keep the point-cloud organized or not", true);
 		}
 
-		static void declare_io(const tendrils& params, tendrils& inputs, tendrils& outputs)
+		static void declare_io(const tendrils& params, 
+                           tendrils& inputs, tendrils& outputs)
 		{
 			outputs.declare<ecto::pcl::PointCloud> ("output", "Filtered Cloud.");
 		}
 
-		void configure(const tendrils& params, const tendrils& inputs, const tendrils& outputs)
+		void configure(const tendrils& params, 
+                   const tendrils& inputs, const tendrils& outputs)
 		{
 			filter_field_name_ = params["filter_field_name"];
 			filter_limit_min_ = params["filter_limit_min"];
@@ -48,7 +46,7 @@ namespace cloud_treatment
 
 		template <typename Point>
 		int process(const tendrils& inputs, const tendrils& outputs,
-					boost::shared_ptr<const ::pcl::PointCloud<Point> >& input)
+					      boost::shared_ptr<const ::pcl::PointCloud<Point> >& input)
 		{
 			::pcl::PassThrough<Point> filter;
 			filter.setFilterFieldName(*filter_field_name_);
@@ -57,7 +55,8 @@ namespace cloud_treatment
 			filter.setKeepOrganized(keep_organized_);
 			filter.setInputCloud(input);
 
-			typename ::pcl::PointCloud<Point>::Ptr cloud(new typename ::pcl::PointCloud<Point>);
+			typename ::pcl::PointCloud<Point>::Ptr cloud(
+                                     new typename ::pcl::PointCloud<Point>);
 			filter.filter(*cloud);
 			cloud->header = input->header;
 			*output_ = ecto::pcl::xyz_cloud_variant_t(cloud);
@@ -76,6 +75,7 @@ namespace cloud_treatment
 
 
 
-ECTO_CELL(cloud_treatment, ecto::pcl::PclCell<cloud_treatment::PassThroughCell>,
+ECTO_CELL(cloud_treatment,
+      ecto::pcl::PclCell<cloud_treatment::PassThroughCell>,
 		  "PassThroughCell", "PassThrough filter");
 
